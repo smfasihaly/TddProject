@@ -1,4 +1,4 @@
-package com.tdd.expensetracker.expense_tracker_app.model;
+package com.tdd.expensetracker.model;
 
 import java.time.LocalDate;
 import java.util.Date;

@@ -1,4 +1,4 @@
-package com.tdd.expensetracker.expense_tracker_app.model;
+package com.tdd.expensetracker.model;
 
 public class Category {
 

@@ -1,8 +1,8 @@
-package com.tdd.expensetracker.expense_tracker_app.controller;
+package com.tdd.expensetracker.controller;
 
-import com.tdd.expensetracker.expense_tracker_app.model.Category;
-import com.tdd.expensetracker.expense_tracker_app.repository.CategoryRepository;
-import com.tdd.expensetracker.expense_tracker_app.view.CategoryView;
+import com.tdd.expensetracker.model.Category;
+import com.tdd.expensetracker.repository.CategoryRepository;
+import com.tdd.expensetracker.view.CategoryView;
 
 public class CategoryController {
 	private CategoryView categoryView;

@@ -1,4 +1,4 @@
-package com.tdd.expensetracker.expense_tracker_app.controller;
+package com.tdd.expensetracker.controller;
 
 import static org.mockito.Mockito.*;
 
@@ -14,10 +14,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.tdd.expensetracker.expense_tracker_app.model.Category;
-import com.tdd.expensetracker.expense_tracker_app.model.Expense;
-import com.tdd.expensetracker.expense_tracker_app.repository.CategoryRepository;
-import com.tdd.expensetracker.expense_tracker_app.view.CategoryView;
+import com.tdd.expensetracker.controller.CategoryController;
+import com.tdd.expensetracker.model.Category;
+import com.tdd.expensetracker.model.Expense;
+import com.tdd.expensetracker.repository.CategoryRepository;
+import com.tdd.expensetracker.view.CategoryView;
 
 public class CategoryControllerTest {
 	@Mock

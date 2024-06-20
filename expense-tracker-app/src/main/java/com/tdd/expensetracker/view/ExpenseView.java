@@ -1,8 +1,8 @@
-package com.tdd.expensetracker.expense_tracker_app.view;
+package com.tdd.expensetracker.view;
 
 import java.util.List;
 
-import com.tdd.expensetracker.expense_tracker_app.model.Expense;
+import com.tdd.expensetracker.model.Expense;
 
 public interface ExpenseView {
 
