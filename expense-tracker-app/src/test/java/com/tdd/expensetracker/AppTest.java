@@ -1,4 +1,4 @@
-package com.tdd.expensetracker.expense_tracker_app;
+package com.tdd.expensetracker;
 
 import static org.junit.Assert.assertTrue;
 
