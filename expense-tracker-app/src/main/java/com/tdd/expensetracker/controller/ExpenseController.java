@@ -1,7 +1,5 @@
 package com.tdd.expensetracker.controller;
 
-import java.awt.image.RescaleOp;
-import java.util.List;
 
 import com.tdd.expensetracker.model.Category;
 import com.tdd.expensetracker.model.Expense;
@@ -85,6 +83,7 @@ public class ExpenseController {
 
 	
 	public void setCategoryRepository(CategoryRepository categoryRepository) {
+		
 		this.categoryRepository = categoryRepository;
 	}
 

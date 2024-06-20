@@ -2,7 +2,6 @@ package com.tdd.expensetracker.controller;
 
 import static org.mockito.Mockito.*;
 
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -14,9 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.tdd.expensetracker.controller.CategoryController;
 import com.tdd.expensetracker.model.Category;
-import com.tdd.expensetracker.model.Expense;
 import com.tdd.expensetracker.repository.CategoryRepository;
 import com.tdd.expensetracker.view.CategoryView;
 

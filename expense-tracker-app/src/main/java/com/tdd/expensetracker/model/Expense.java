@@ -1,7 +1,6 @@
 package com.tdd.expensetracker.model;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 public class Expense {
 
@@ -10,7 +9,7 @@ public class Expense {
 	private String description;
 	private LocalDate date;
 	private Category category;
-
+	
 	// Constructor
 	public Expense(String id, long amount, String description, LocalDate date, Category category) {
 		this.id = id;
@@ -21,6 +20,35 @@ public class Expense {
 	}
 
 	public Expense() {
+	}
+
+	
+	public long getAmount() {
+		return amount;
+	}
+
+	public void setAmount(long amount) {
+		this.amount = amount;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public LocalDate getDate() {
+		return date;
+	}
+
+	public void setDate(LocalDate date) {
+		this.date = date;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public String getId() {

@@ -14,7 +14,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.tdd.expensetracker.controller.ExpenseController;
 import com.tdd.expensetracker.model.Category;
 import com.tdd.expensetracker.model.Expense;
 import com.tdd.expensetracker.repository.CategoryRepository;
