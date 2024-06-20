@@ -59,7 +59,7 @@ public class ExpenseControlerTest {
 	}
 
 	@Test
-	public void testNewExpenseWhenExpenseDoesNotAlreadyExist() {
+	public void testNewExpenseWhenExpenseDoesNotExist() {
 
 		Category existingCategory = new Category("1", "name1", "description1");
 		when(categoryRepository.findById("1")).thenReturn(existingCategory);
@@ -107,7 +107,7 @@ public class ExpenseControlerTest {
 	}
 
 	@Test
-	public void testDeleteExpenseWhenExist() {
+	public void testDeleteExpenseWhenExpenseExist() {
 
 		Category existingCategory = new Category("1", "name1", "description1");
 
@@ -122,7 +122,7 @@ public class ExpenseControlerTest {
 	}
 
 	@Test
-	public void testDeleteExpenseWhenDoesNotExist() {
+	public void testDeleteExpenseWhenExpenseDoesNotExist() {
 
 		Category existingCategory = new Category("1", "name1", "description1");
 
@@ -136,9 +136,10 @@ public class ExpenseControlerTest {
 	}
 
 	@Test
-	public void testUpdateExpenseWhenExist() {
+	public void testUpdateExpenseWhenExpenseExist() {
 
 		Category existingCategory = new Category("1", "name1", "description1");
+		when(categoryRepository.findById("1")).thenReturn(existingCategory);
 
 		Expense updatedExpense = new Expense("1", 10000, "testExpense", LocalDate.now(), existingCategory);
 
@@ -153,7 +154,7 @@ public class ExpenseControlerTest {
 	}
 
 	@Test
-	public void testUpdateExpenseWhenDoesNotExist() {
+	public void testUpdateExpenseWhenExpenseDoesNotExist() {
 
 		Category existingCategory = new Category("1", "name1", "description1");
 
@@ -163,6 +164,22 @@ public class ExpenseControlerTest {
 		expenseController.updateExpense(updatedExpense);
 
 		verify(expenseView).showError("Expense does not exist with id 1", updatedExpense);
+		verifyNoMoreInteractions(ignoreStubs(expenseRepository));
+
+	}
+	
+	@Test
+	public void testUpdateExpenseWhenCategoryDoesNotExist() {
+
+		Category existingCategory = new Category("1", "name1", "description1");
+		when(categoryRepository.findById("1")).thenReturn(null);
+
+		Expense updatedExpense = new Expense("1", 10000, "testExpense", LocalDate.now(), existingCategory);
+		when(expenseRepository.findById("1")).thenReturn(updatedExpense);
+
+		expenseController.updateExpense(updatedExpense);
+
+		verify(expenseView).showError("Category does not exist with id 1", updatedExpense);
 		verifyNoMoreInteractions(ignoreStubs(expenseRepository));
 
 	}

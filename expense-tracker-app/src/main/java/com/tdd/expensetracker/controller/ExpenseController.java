@@ -70,6 +70,14 @@ public class ExpenseController {
 			this.expenseView.showError("Expense does not exist with id " + updatedExpense.getId(), updatedExpense);
 			return;
 		}
+		
+		String updatedExpenseCategoryId = (updatedExpense.getCategory()).getId();
+		Category existingCategory = categoryRepository.findById(updatedExpenseCategoryId);
+		
+		if (existingCategory == null) {
+			expenseView.showError("Category does not exist with id " + updatedExpenseCategoryId, updatedExpense);
+			return;
+		}
 
 		expenseRepository.update(updatedExpense);
 		expenseView.expenseUpdated(updatedExpense);
