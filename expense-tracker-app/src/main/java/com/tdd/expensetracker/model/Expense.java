@@ -23,44 +23,44 @@ public class Expense {
 	}
 
 	
-	public long getAmount() {
-		return amount;
-	}
-
-	public void setAmount(long amount) {
-		this.amount = amount;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public LocalDate getDate() {
-		return date;
-	}
-
-	public void setDate(LocalDate date) {
-		this.date = date;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
+//	public long getAmount() {
+//		return amount;
+//	}
+//
+//	public void setAmount(long amount) {
+//		this.amount = amount;
+//	}
+//
+//	public String getDescription() {
+//		return description;
+//	}
+//
+//	public void setDescription(String description) {
+//		this.description = description;
+//	}
+//
+//	public LocalDate getDate() {
+//		return date;
+//	}
+//
+//	public void setDate(LocalDate date) {
+//		this.date = date;
+//	}
+//
+//	public void setId(String id) {
+//		this.id = id;
+//	}
 
 	public String getId() {
 		// TODO Auto-generated method stub
 		return id;
 	}
 
-	public void setCategory(Category category) {
-		// TODO Auto-generated method stub
-		this.category = category;
-		
-	}
+//	public void setCategory(Category category) {
+//		// TODO Auto-generated method stub
+//		this.category = category;
+//		
+//	}
 
 	public Category getCategory() {
 		return category;
