@@ -11,24 +11,24 @@ public class ValidateUtilsTest {
 	@Test
 	public void testValidateRequiredStringIfStringisNotEmpty() {
 
-		boolean isValidString = ValidateUtils.validateRequiredString("this is valid string");
+		boolean isValidString = ValidateUtils.validateRequiredString("this is valid string","String");
 		assertTrue(isValidString);
 	}
 
 	@Test
 	public void testValidateRequiredStringIfStringisEmpty() {
 
-		ValidationException e = assertThrows(ValidationException.class, () -> ValidateUtils.validateRequiredString(""));
+		ValidationException e = assertThrows(ValidationException.class, () -> ValidateUtils.validateRequiredString("","String"));
 		assertEquals("String is required and cannot be null or empty",e.getMessage());
 	}
 
 	@Test
 	public void testValidateRequiredStringIfStringisNull() {
 
-		ValidationException e = assertThrows(ValidationException.class, () -> ValidateUtils.validateRequiredString(null));
+		ValidationException e = assertThrows(ValidationException.class, () -> ValidateUtils.validateRequiredString(null,"String"));
 		assertEquals("String is required and cannot be null or empty",e.getMessage());
-	
 	}
+	
 
 	@Test
 	public void testValidateAmountIfAmountisPositive() {
@@ -85,4 +85,6 @@ public class ValidateUtilsTest {
 
 	}
 
+	
+	
 }

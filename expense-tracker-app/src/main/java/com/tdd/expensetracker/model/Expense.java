@@ -23,26 +23,26 @@ public class Expense {
 	}
 
 	
-//	public long getAmount() {
-//		return amount;
-//	}
+	public long getAmount() {
+		return amount;
+	}
 //
 //	public void setAmount(long amount) {
 //		this.amount = amount;
 //	}
 //
-//	public String getDescription() {
-//		return description;
-//	}
+	public String getDescription() {
+		return description;
+	}
 //
 //	public void setDescription(String description) {
 //		this.description = description;
 //	}
 //
-//	public LocalDate getDate() {
-//		return date;
-//	}
-//
+	public LocalDate getDate() {
+		return date;
+	}
+
 //	public void setDate(LocalDate date) {
 //		this.date = date;
 //	}
@@ -65,6 +65,8 @@ public class Expense {
 	public Category getCategory() {
 		return category;
 	}
+
+	
 
 
 

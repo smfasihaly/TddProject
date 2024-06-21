@@ -104,6 +104,90 @@ public class ExpenseControlerTest {
 		verifyNoMoreInteractions(ignoreStubs(expenseRepository));
 
 	}
+	@Test
+	public void testNewExpenseExpenseWhenCategoryIsNull() {
+
+		
+		Expense updatedExpense = new Expense("1", 10000, "testExpense", LocalDate.now(), null);
+		when(expenseRepository.findById("1")).thenReturn(updatedExpense);
+
+		expenseController.newExpense(updatedExpense);
+
+		verify(expenseView).showError("Category cannot be null", updatedExpense);
+		verifyNoMoreInteractions(ignoreStubs(expenseRepository));
+
+	}
+	
+	@Test
+	public void testNewExpenseWhenAmountIsZero() {
+
+		Category existingCategory = new Category("1", "name1", "description1");
+
+		Expense newExpense = new Expense("1", 0, "testExpense", LocalDate.now(), existingCategory);
+
+		expenseController.newExpense(newExpense);
+
+		verify(expenseView).showError("Amount must be greater than zero", newExpense);
+		verifyNoMoreInteractions(ignoreStubs(expenseRepository));
+
+	}
+	
+	@Test
+	public void testNewExpenseWhenAmountIsNegative() {
+
+		Category existingCategory = new Category("1", "name1", "description1");
+
+		Expense newExpense = new Expense("1", -10000, "testExpense", LocalDate.now(), existingCategory);
+
+		expenseController.newExpense(newExpense);
+
+		verify(expenseView).showError("Amount must be greater than zero", newExpense);
+		verifyNoMoreInteractions(ignoreStubs(expenseRepository));
+
+	}
+	
+	@Test
+	public void testNewExpenseWhenDescriptionIsEmpty() {
+
+		Category existingCategory = new Category("1", "name1", "description1");
+
+		Expense newExpense = new Expense("1", 10000, "", LocalDate.now(), existingCategory);
+
+		expenseController.newExpense(newExpense);
+
+		verify(expenseView).showError("Description is required and cannot be null or empty", newExpense);
+		verifyNoMoreInteractions(ignoreStubs(expenseRepository));
+
+	}
+	
+	@Test
+	public void testNewExpenseWhenDateIsInFuture() {
+
+		Category existingCategory = new Category("1", "name1", "description1");
+
+		Expense newExpense = new Expense("1", 10000, "Description1", LocalDate.now().plusDays(10), existingCategory);
+
+		expenseController.newExpense(newExpense);
+
+		verify(expenseView).showError("Date cannot be in the future", newExpense);
+		verifyNoMoreInteractions(ignoreStubs(expenseRepository));
+
+	}
+	
+	@Test
+	public void testNewExpenseWhenDateIsNull() {
+
+		Category existingCategory = new Category("1", "name1", "description1");
+
+		Expense newExpense = new Expense("1", 10000, "Description1", null, existingCategory);
+
+		expenseController.newExpense(newExpense);
+
+		verify(expenseView).showError("Date is required and cannot be null", newExpense);
+		verifyNoMoreInteractions(ignoreStubs(expenseRepository));
+
+	}
+	
 
 	@Test
 	public void testDeleteExpenseWhenExpenseExist() {
@@ -182,5 +266,94 @@ public class ExpenseControlerTest {
 		verifyNoMoreInteractions(ignoreStubs(expenseRepository));
 
 	}
+	
+	@Test
+	public void testUpdateExpenseWhenCategoryIsNull() {
+
+		
+		Expense updatedExpense = new Expense("1", 10000, "testExpense", LocalDate.now(), null);
+		when(expenseRepository.findById("1")).thenReturn(updatedExpense);
+
+		expenseController.updateExpense(updatedExpense);
+
+		verify(expenseView).showError("Category cannot be null", updatedExpense);
+		verifyNoMoreInteractions(ignoreStubs(expenseRepository));
+
+	}
+	
+	@Test
+	public void testUpdateExpenseWhenAmountIsZero() {
+
+		Category existingCategory = new Category("1", "name1", "description1");
+		when(categoryRepository.findById("1")).thenReturn(existingCategory);
+
+		Expense updatedExpense = new Expense("1", 0, "testExpense", LocalDate.now(), existingCategory);
+		when(expenseRepository.findById("1")).thenReturn(updatedExpense);
+
+		expenseController.updateExpense(updatedExpense);
+
+		verify(expenseView).showError("Amount must be greater than zero", updatedExpense);
+		verifyNoMoreInteractions(ignoreStubs(expenseRepository));
+
+	}
+	
+	@Test
+	public void testUpdateExpenseWhenAmountIsNegative() {
+
+		Category existingCategory = new Category("1", "name1", "description1");
+		when(categoryRepository.findById("1")).thenReturn(existingCategory);
+
+		Expense updatedExpense = new Expense("1", -10000, "testExpense", LocalDate.now(), existingCategory);
+		when(expenseRepository.findById("1")).thenReturn(updatedExpense);
+
+		expenseController.updateExpense(updatedExpense);
+
+		verify(expenseView).showError("Amount must be greater than zero", updatedExpense);
+		verifyNoMoreInteractions(ignoreStubs(expenseRepository));
+
+	}
+	
+	@Test
+	public void testUpdateExpenseWhenDescriptionIsEmpty() {
+
+		Category existingCategory = new Category("1", "name1", "description1");
+		
+		Expense updatedExpense = new Expense("1", 10000, "", LocalDate.now(), existingCategory);
+		
+		expenseController.updateExpense(updatedExpense);
+
+		verify(expenseView).showError("Description is required and cannot be null or empty", updatedExpense);
+		verifyNoMoreInteractions(ignoreStubs(expenseRepository));
+
+	}
+	
+	@Test
+	public void testUpdateExpenseWhenDateIsInFuture() {
+
+		Category existingCategory = new Category("1", "name1", "description1");
+		
+		Expense updatedExpense = new Expense("1", 10000, "Description1", LocalDate.now().plusDays(10), existingCategory);
+		
+		expenseController.updateExpense(updatedExpense);
+
+		verify(expenseView).showError("Date cannot be in the future", updatedExpense);
+		verifyNoMoreInteractions(ignoreStubs(expenseRepository));
+
+	}
+	
+	@Test
+	public void testUpdateExpenseWhenDateIsNull() {
+
+		Category existingCategory = new Category("1", "name1", "description1");
+		
+		Expense updatedExpense = new Expense("1", 10000, "Description1", null, existingCategory);
+		
+		expenseController.updateExpense(updatedExpense);
+
+		verify(expenseView).showError("Date is required and cannot be null", updatedExpense);
+		verifyNoMoreInteractions(ignoreStubs(expenseRepository));
+
+	}
+	
 
 }

@@ -7,14 +7,15 @@ public class ValidateUtils {
 	private ValidateUtils() {
 	}
 
-	public static boolean validateRequiredString(String string) throws ValidationException {
+	public static boolean validateRequiredString(String string,String fieldName ) throws ValidationException {
 
 		if (string == null || string.trim().isEmpty()) {
-			throw new ValidationException("String is required and cannot be null or empty");
+			throw new ValidationException(fieldName +" is required and cannot be null or empty");
 		}
 
 		return true;
 	}
+
 
 	public static boolean validateAmount(long amount) throws ValidationException {
 
