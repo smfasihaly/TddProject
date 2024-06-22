@@ -37,7 +37,6 @@ public class ExpenseControlerTest {
 	public void setup() {
 
 		closeable = MockitoAnnotations.openMocks(this);
-		expenseController.setCategoryRepository(categoryRepository);
 	}
 
 	@After
@@ -119,6 +118,19 @@ public class ExpenseControlerTest {
 	}
 	
 	@Test
+	public void testNewExpenseWhenDescriptionIsEmpty() {
+		
+		Category existingCategory = new Category("1", "name1", "description1");
+		
+		Expense newExpense = new Expense("1", 10000, "", LocalDate.now(), existingCategory);
+		
+		expenseController.newExpense(newExpense);
+		
+		verify(expenseView).showError("Description is required and cannot be null or empty", newExpense);
+		verifyNoMoreInteractions(ignoreStubs(expenseRepository));
+	}
+
+	@Test
 	public void testNewExpenseWhenAmountIsZero() {
 
 		Category existingCategory = new Category("1", "name1", "description1");
@@ -146,19 +158,6 @@ public class ExpenseControlerTest {
 
 	}
 	
-	@Test
-	public void testNewExpenseWhenDescriptionIsEmpty() {
-
-		Category existingCategory = new Category("1", "name1", "description1");
-
-		Expense newExpense = new Expense("1", 10000, "", LocalDate.now(), existingCategory);
-
-		expenseController.newExpense(newExpense);
-
-		verify(expenseView).showError("Description is required and cannot be null or empty", newExpense);
-		verifyNoMoreInteractions(ignoreStubs(expenseRepository));
-
-	}
 	
 	@Test
 	public void testNewExpenseWhenDateIsInFuture() {
@@ -197,7 +196,7 @@ public class ExpenseControlerTest {
 		Expense expenseToDelete = new Expense("1", 5000, "testExpense", LocalDate.now(), existingCategory);
 		when(expenseRepository.findById("1")).thenReturn(expenseToDelete);
 
-		expenseController.DeleteExpense(expenseToDelete);
+		expenseController.deleteExpense(expenseToDelete);
 
 		InOrder inOrder = inOrder(expenseRepository, expenseView);
 		inOrder.verify(expenseRepository).delete("1");
@@ -212,7 +211,7 @@ public class ExpenseControlerTest {
 		Expense expenseToDelete = new Expense("1", 5000, "testExpense", LocalDate.now(), existingCategory);
 		when(expenseRepository.findById("1")).thenReturn(null);
 
-		expenseController.DeleteExpense(expenseToDelete);
+		expenseController.deleteExpense(expenseToDelete);
 
 		verify(expenseView).showError("Expense does not exist with id 1", expenseToDelete);
 		verifyNoMoreInteractions(ignoreStubs(expenseRepository));

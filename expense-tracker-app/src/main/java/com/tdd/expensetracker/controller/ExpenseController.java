@@ -14,10 +14,11 @@ public class ExpenseController {
 	private ExpenseRepository expenseRepository;
 	private CategoryRepository categoryRepository;
 
-	public ExpenseController(ExpenseView expenseView, ExpenseRepository expenseRepository) {
+	public ExpenseController(ExpenseView expenseView, ExpenseRepository expenseRepository, CategoryRepository categoryRepository) {
 
 		this.expenseView = expenseView;
 		this.expenseRepository = expenseRepository;
+		this.categoryRepository = categoryRepository;
 	}
 
 	public void allExpense() {
@@ -27,9 +28,9 @@ public class ExpenseController {
 
 	public void newExpense(Expense expense) {
 
-		boolean isValid = ValidateExpense(expense);
+		boolean isValid = validateExpense(expense);
 
-		if (isValid == false) {
+		if (!isValid) {
 			return;
 		}
 
@@ -50,11 +51,10 @@ public class ExpenseController {
 
 		expenseRepository.save(expense);
 		expenseView.expenseAdded(expense);
-
+ 
 	}
 
-
-	public void DeleteExpense(Expense expenseToDelete) {
+	public void deleteExpense(Expense expenseToDelete) {
 
 		Expense existingExpense = expenseRepository.findById(expenseToDelete.getId());
 
@@ -69,9 +69,9 @@ public class ExpenseController {
 
 	public void updateExpense(Expense updatedExpense) {
 
-		boolean isValid = ValidateExpense(updatedExpense);
+		boolean isValid = validateExpense(updatedExpense);
 
-		if (isValid == false) {
+		if (!isValid) {
 			return;
 		}
 
@@ -94,12 +94,7 @@ public class ExpenseController {
 		expenseView.expenseUpdated(updatedExpense);
 	}
 
-	public void setCategoryRepository(CategoryRepository categoryRepository) {
-
-		this.categoryRepository = categoryRepository;
-	}
-	
-	private boolean ValidateExpense(Expense expense) {
+	private boolean validateExpense(Expense expense) {
 		try {
 			ValidateUtils.validateAmount(expense.getAmount());
 			ValidateUtils.validateDate(expense.getDate());
@@ -116,6 +111,5 @@ public class ExpenseController {
 		return true;
 
 	}
-
 
 }

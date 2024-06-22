@@ -68,10 +68,28 @@ public class CategoryControllerTest {
 	}
 	
 	@Test
+	public void testNewCategoryWhenNameIsEmpty() {
+		Category newCategory = new Category("1", "","description1");
+		categoryController.newCategory(newCategory);
+		verify(categoryView).showError("Name is required and cannot be null or empty", newCategory);
+		verifyNoMoreInteractions(ignoreStubs(categoryRepository));
+
+	}
+	
+	@Test
+	public void testNewCategoryWhenDescriptionIsEmpty() {
+		Category newCategory = new Category("1", "Name","");
+		categoryController.newCategory(newCategory);
+		verify(categoryView).showError("Description is required and cannot be null or empty", newCategory);
+		verifyNoMoreInteractions(ignoreStubs(categoryRepository));
+
+	}
+	
+	@Test
 	public void testDeleteCategoryWhenExist() {
 		Category categoryToDelete = new Category("1", "name1","description1");
 		when(categoryRepository.findById("1")).thenReturn(categoryToDelete);
-			categoryController.DeleteCategory(categoryToDelete);
+			categoryController.deleteCategory(categoryToDelete);
 		InOrder inOrder = inOrder(categoryRepository, categoryView);
 		inOrder.verify(categoryRepository).delete("1");
 		inOrder.verify(categoryView).categoryDeleted("1");
@@ -81,7 +99,7 @@ public class CategoryControllerTest {
 	public void testDeleteCategoryWhenDoesNotExist() {
 		Category categoryToDelete = new Category("1", "name1","description1");
 		when(categoryRepository.findById("1")).thenReturn(null);
-		categoryController.DeleteCategory(categoryToDelete);
+		categoryController.deleteCategory(categoryToDelete);
 		verify(categoryView).showError("Category does not exist with id 1", categoryToDelete);
 		verifyNoMoreInteractions(ignoreStubs(categoryRepository));
 	}
@@ -106,6 +124,26 @@ public class CategoryControllerTest {
 		verifyNoMoreInteractions(ignoreStubs(categoryRepository));
 
 	}
+	
+
+	@Test
+	public void testUpdateCategoryWhenNameIsEmpty() {
+		Category updatedCategory = new Category("1", "","description1");
+		categoryController.updateCategory(updatedCategory);
+		verify(categoryView).showError("Name is required and cannot be null or empty", updatedCategory);
+		verifyNoMoreInteractions(ignoreStubs(categoryRepository));
+
+	}
+	
+	@Test
+	public void testUpdateCategoryWhenDescriptionIsEmpty() {
+		Category updatedCategory = new Category("1", "name","");
+		categoryController.updateCategory(updatedCategory);
+		verify(categoryView).showError("Description is required and cannot be null or empty", updatedCategory);
+		verifyNoMoreInteractions(ignoreStubs(categoryRepository));
+
+	}
+	
 	
 	
 

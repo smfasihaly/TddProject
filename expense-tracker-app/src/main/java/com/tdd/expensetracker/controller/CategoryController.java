@@ -2,6 +2,8 @@ package com.tdd.expensetracker.controller;
 
 import com.tdd.expensetracker.model.Category;
 import com.tdd.expensetracker.repository.CategoryRepository;
+import com.tdd.expensetracker.utils.ValidateUtils;
+import com.tdd.expensetracker.utils.ValidationException;
 import com.tdd.expensetracker.view.CategoryView;
 
 public class CategoryController {
@@ -21,6 +23,11 @@ public class CategoryController {
 	}
 
 	public void newCategory(Category category) {
+		
+		if(!validateCategory(category))
+		{
+			return;
+		}
 
 		Category existingCategory = categoryRepository.findById(category.getId());
 		
@@ -33,7 +40,7 @@ public class CategoryController {
 		categoryView.categoryAdded(category);
 	}
 
-	public void DeleteCategory(Category categoryToDelete) {
+	public void deleteCategory(Category categoryToDelete) {
 		
 		Category existingCategory = categoryRepository.findById(categoryToDelete.getId());
 		
@@ -49,6 +56,10 @@ public class CategoryController {
 
 	public void updateCategory(Category categoryToUpdate) {
 		
+		if(!validateCategory(categoryToUpdate)) {
+			return;
+		}
+		
 		Category existingCategory = categoryRepository.findById(categoryToUpdate.getId());
 		
 		if(existingCategory == null) {
@@ -58,5 +69,20 @@ public class CategoryController {
 		
 		categoryRepository.update(categoryToUpdate);
 		categoryView.categoryUpdated(categoryToUpdate);
+	}
+
+	/**
+	 * @param categoryToUpdate
+	 */
+	private boolean validateCategory(Category categoryToUpdate) {
+		try {
+			ValidateUtils.validateRequiredString(categoryToUpdate.getName(), "Name");
+			ValidateUtils.validateRequiredString(categoryToUpdate.getDescription(), "Description");
+			return true;
+			
+		}catch (ValidationException exception) {
+			categoryView.showError(exception.getMessage(), categoryToUpdate);
+			return false;
+		}
 	}
 }

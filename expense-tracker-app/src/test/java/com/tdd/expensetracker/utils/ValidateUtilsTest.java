@@ -1,90 +1,82 @@
 package com.tdd.expensetracker.utils;
 
-import static org.junit.Assert.*;
 
 import java.time.LocalDate;
 
 import org.junit.Test;
+import static org.assertj.core.api.Assertions.*;
 
 public class ValidateUtilsTest {
 
 	@Test
 	public void testValidateRequiredStringIfStringisNotEmpty() {
 
-		boolean isValidString = ValidateUtils.validateRequiredString("this is valid string","String");
-		assertTrue(isValidString);
+		boolean isValidString = ValidateUtils.validateRequiredString("this is valid string", "String");
+		assertThat(isValidString).isTrue();
 	}
 
 	@Test
 	public void testValidateRequiredStringIfStringisEmpty() {
 
-		ValidationException e = assertThrows(ValidationException.class, () -> ValidateUtils.validateRequiredString("","String"));
-		assertEquals("String is required and cannot be null or empty",e.getMessage());
+		assertThatThrownBy(() -> ValidateUtils.validateRequiredString("", "String"))
+				.isInstanceOf(ValidationException.class).hasMessage("String is required and cannot be null or empty");
 	}
 
 	@Test
 	public void testValidateRequiredStringIfStringisNull() {
 
-		ValidationException e = assertThrows(ValidationException.class, () -> ValidateUtils.validateRequiredString(null,"String"));
-		assertEquals("String is required and cannot be null or empty",e.getMessage());
+		assertThatThrownBy(() -> ValidateUtils.validateRequiredString(null, "String"))
+				.isInstanceOf(ValidationException.class).hasMessage("String is required and cannot be null or empty");
 	}
-	
 
 	@Test
 	public void testValidateAmountIfAmountisPositive() {
 
 		boolean isValidAmount = ValidateUtils.validateAmount(100);
-		assertTrue(isValidAmount);
+		assertThat(isValidAmount).isTrue();
 	}
 
 	@Test
 	public void testValidateAmountIfAmountisNegative() {
 
-		ValidationException e = assertThrows(ValidationException.class, () -> ValidateUtils.validateAmount(-100));
-		// perform assertions on the thrown exception
-		assertEquals("Amount must be greater than zero", e.getMessage());
+		assertThatThrownBy(() -> ValidateUtils.validateAmount(-100)).isInstanceOf(ValidationException.class)
+				.hasMessage("Amount must be greater than zero");
 	}
 
 	@Test
 	public void testValidateAmountIfAmountisZero() {
 
-		ValidationException e = assertThrows(ValidationException.class, () -> ValidateUtils.validateAmount(0));
-		assertEquals("Amount must be greater than zero", e.getMessage());
+		assertThatThrownBy(() -> ValidateUtils.validateAmount(0)).isInstanceOf(ValidationException.class)
+				.hasMessage("Amount must be greater than zero");
 	}
 
 	@Test
 	public void testIsValidDateIfDateIsValid() {
 
 		boolean isValidDate = ValidateUtils.validateDate(LocalDate.now());
-		assertTrue(isValidDate);
+		assertThat(isValidDate).isTrue();
 	}
 
 	@Test
 	public void testValidateDateIfDateIsNull() {
 
-
-		ValidationException e = assertThrows(ValidationException.class, () -> ValidateUtils.validateDate(null));
-		assertEquals("Date is required and cannot be null",e.getMessage());
-	
+		assertThatThrownBy(() -> ValidateUtils.validateDate(null)).isInstanceOf(ValidationException.class)
+				.hasMessage("Date is required and cannot be null");
 	}
 
 	@Test
 	public void testValidateDateIfDateIsInPast() {
-		
+
 		boolean isValidDate = ValidateUtils.validateDate(LocalDate.now().minusDays(30));
-		assertTrue(isValidDate);
+		assertThat(isValidDate).isTrue();
 	}
 
 	@Test
 	public void testValidateDateIfDateIsInFuture() {
-
-		ValidationException e = assertThrows(ValidationException.class,
-				() -> ValidateUtils.validateDate(LocalDate.now().plusDays(1)));
-		// perform assertions on the thrown exception
-		assertEquals("Date cannot be in the future", e.getMessage());
-
+		
+		LocalDate futureDate = LocalDate.now().plusDays(1);
+		assertThatThrownBy(() -> ValidateUtils.validateDate(futureDate))
+				.isInstanceOf(ValidationException.class).hasMessage("Date cannot be in the future");
 	}
 
-	
-	
 }
