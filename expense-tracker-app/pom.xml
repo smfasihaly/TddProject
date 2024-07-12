@@ -244,7 +244,7 @@
 								</env>
 								<wait>
 									<log>ready for connections</log> <!-- Log message indicating MySQL is ready -->
-									<time>20000</time> <!-- Wait time may need to be adjusted based on typical startup time -->
+									<time>40000</time> <!-- Wait time may need to be adjusted based on typical startup time -->
 
 								</wait>
 							</run>
