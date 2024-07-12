@@ -32,21 +32,21 @@ public class ValidateUtilsTest {
 	@Test
 	public void testValidateAmountIfAmountisPositive() {
 
-		boolean isValidAmount = ValidateUtils.validateAmount(100);
+		boolean isValidAmount = ValidateUtils.validateAmount(100.0);
 		assertThat(isValidAmount).isTrue();
 	}
 
 	@Test
 	public void testValidateAmountIfAmountisNegative() {
 
-		assertThatThrownBy(() -> ValidateUtils.validateAmount(-100)).isInstanceOf(ValidationException.class)
+		assertThatThrownBy(() -> ValidateUtils.validateAmount(-100.0)).isInstanceOf(ValidationException.class)
 				.hasMessage("Amount must be greater than zero");
 	}
 
 	@Test
 	public void testValidateAmountIfAmountisZero() {
 
-		assertThatThrownBy(() -> ValidateUtils.validateAmount(0)).isInstanceOf(ValidationException.class)
+		assertThatThrownBy(() -> ValidateUtils.validateAmount(0d)).isInstanceOf(ValidationException.class)
 				.hasMessage("Amount must be greater than zero");
 	}
 

@@ -62,8 +62,8 @@ public class ExpenseController {
 			this.expenseView.showError("Expense does not exist with id " + expenseToDelete.getId(), expenseToDelete);
 			return;
 		}
-
-		expenseRepository.delete(expenseToDelete.getId());
+ 
+		expenseRepository.delete(expenseToDelete);
 		expenseView.expenseDeleted(expenseToDelete.getId());
 	}
 

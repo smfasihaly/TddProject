@@ -12,7 +12,7 @@ public interface CategoryRepository {
 
 	public void save(Category category);
 
-	public void delete(String id);
+	public void delete(Category category);
 
 	public void update(Category updatedCategory);
 

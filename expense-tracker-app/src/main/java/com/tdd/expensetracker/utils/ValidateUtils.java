@@ -17,7 +17,7 @@ public class ValidateUtils {
 	}
 
 
-	public static boolean validateAmount(long amount) throws ValidationException {
+	public static boolean validateAmount(Double amount) throws ValidationException {
 
 		if (amount <= 0) {
 			throw new ValidationException("Amount must be greater than zero");

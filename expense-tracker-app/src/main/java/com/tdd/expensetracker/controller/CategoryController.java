@@ -49,7 +49,7 @@ public class CategoryController {
 			return;
 		}
 
-		categoryRepository.delete(categoryToDelete.getId());
+		categoryRepository.delete(categoryToDelete);
 		categoryView.categoryDeleted(categoryToDelete.getId());
 
 	}

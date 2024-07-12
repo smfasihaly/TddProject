@@ -62,7 +62,7 @@ public class ExpenseControlerTest {
 		Category existingCategory = new Category("1", "name1", "description1");
 		when(categoryRepository.findById("1")).thenReturn(existingCategory);
 
-		Expense expense = new Expense("1", 5000, "testExpense", LocalDate.now(), existingCategory);
+		Expense expense = new Expense("1", 5000d, "testExpense", LocalDate.now(), existingCategory);
 		when(expenseRepository.findById("1")).thenReturn(null);
 
 		expenseController.newExpense(expense);
@@ -77,9 +77,9 @@ public class ExpenseControlerTest {
 
 		Category existingCategory = new Category("1", "name1", "description1");
 
-		Expense newExpense = new Expense("1", 5000, "testExpense", LocalDate.now(), existingCategory);
+		Expense newExpense = new Expense("1", 5000d, "testExpense", LocalDate.now(), existingCategory);
 
-		Expense existingExpense = new Expense("1", 5000, "testExpense", LocalDate.now(), existingCategory);
+		Expense existingExpense = new Expense("1", 5000d, "testExpense", LocalDate.now(), existingCategory);
 		when(expenseRepository.findById("1")).thenReturn(existingExpense);
 
 		expenseController.newExpense(newExpense);
@@ -94,7 +94,7 @@ public class ExpenseControlerTest {
 		Category existingCategory = new Category("1", "name1", "description1");
 		when(categoryRepository.findById("1")).thenReturn(null);
 
-		Expense newExpense = new Expense("1", 5000, "testExpense", LocalDate.now(), existingCategory);
+		Expense newExpense = new Expense("1", 5000d, "testExpense", LocalDate.now(), existingCategory);
 		when(expenseRepository.findById("1")).thenReturn(null);
 
 		expenseController.newExpense(newExpense);
@@ -107,7 +107,7 @@ public class ExpenseControlerTest {
 	public void testNewExpenseExpenseWhenCategoryIsNull() {
 
 		
-		Expense updatedExpense = new Expense("1", 10000, "testExpense", LocalDate.now(), null);
+		Expense updatedExpense = new Expense("1", 10000d, "testExpense", LocalDate.now(), null);
 		when(expenseRepository.findById("1")).thenReturn(updatedExpense);
 
 		expenseController.newExpense(updatedExpense);
@@ -122,7 +122,7 @@ public class ExpenseControlerTest {
 		
 		Category existingCategory = new Category("1", "name1", "description1");
 		
-		Expense newExpense = new Expense("1", 10000, "", LocalDate.now(), existingCategory);
+		Expense newExpense = new Expense("1", 10000d, "", LocalDate.now(), existingCategory);
 		
 		expenseController.newExpense(newExpense);
 		
@@ -135,7 +135,7 @@ public class ExpenseControlerTest {
 
 		Category existingCategory = new Category("1", "name1", "description1");
 
-		Expense newExpense = new Expense("1", 0, "testExpense", LocalDate.now(), existingCategory);
+		Expense newExpense = new Expense("1", 0d, "testExpense", LocalDate.now(), existingCategory);
 
 		expenseController.newExpense(newExpense);
 
@@ -149,7 +149,7 @@ public class ExpenseControlerTest {
 
 		Category existingCategory = new Category("1", "name1", "description1");
 
-		Expense newExpense = new Expense("1", -10000, "testExpense", LocalDate.now(), existingCategory);
+		Expense newExpense = new Expense("1", -10000d, "testExpense", LocalDate.now(), existingCategory);
 
 		expenseController.newExpense(newExpense);
 
@@ -164,7 +164,7 @@ public class ExpenseControlerTest {
 
 		Category existingCategory = new Category("1", "name1", "description1");
 
-		Expense newExpense = new Expense("1", 10000, "Description1", LocalDate.now().plusDays(10), existingCategory);
+		Expense newExpense = new Expense("1", 10000d, "Description1", LocalDate.now().plusDays(10), existingCategory);
 
 		expenseController.newExpense(newExpense);
 
@@ -178,7 +178,7 @@ public class ExpenseControlerTest {
 
 		Category existingCategory = new Category("1", "name1", "description1");
 
-		Expense newExpense = new Expense("1", 10000, "Description1", null, existingCategory);
+		Expense newExpense = new Expense("1", 10000d, "Description1", null, existingCategory);
 
 		expenseController.newExpense(newExpense);
 
@@ -193,13 +193,13 @@ public class ExpenseControlerTest {
 
 		Category existingCategory = new Category("1", "name1", "description1");
 
-		Expense expenseToDelete = new Expense("1", 5000, "testExpense", LocalDate.now(), existingCategory);
+		Expense expenseToDelete = new Expense("1", 5000d, "testExpense", LocalDate.now(), existingCategory);
 		when(expenseRepository.findById("1")).thenReturn(expenseToDelete);
 
 		expenseController.deleteExpense(expenseToDelete);
 
 		InOrder inOrder = inOrder(expenseRepository, expenseView);
-		inOrder.verify(expenseRepository).delete("1");
+		inOrder.verify(expenseRepository).delete(expenseToDelete);
 		inOrder.verify(expenseView).expenseDeleted("1");
 	}
 
@@ -208,7 +208,7 @@ public class ExpenseControlerTest {
 
 		Category existingCategory = new Category("1", "name1", "description1");
 
-		Expense expenseToDelete = new Expense("1", 5000, "testExpense", LocalDate.now(), existingCategory);
+		Expense expenseToDelete = new Expense("1", 5000d, "testExpense", LocalDate.now(), existingCategory);
 		when(expenseRepository.findById("1")).thenReturn(null);
 
 		expenseController.deleteExpense(expenseToDelete);
@@ -223,9 +223,9 @@ public class ExpenseControlerTest {
 		Category existingCategory = new Category("1", "name1", "description1");
 		when(categoryRepository.findById("1")).thenReturn(existingCategory);
 
-		Expense updatedExpense = new Expense("1", 10000, "testExpense", LocalDate.now(), existingCategory);
+		Expense updatedExpense = new Expense("1", 10000d, "testExpense", LocalDate.now(), existingCategory);
 
-		Expense existingExpense = new Expense("1", 5000, "testExpense", LocalDate.now(), existingCategory);
+		Expense existingExpense = new Expense("1", 5000d, "testExpense", LocalDate.now(), existingCategory);
 		when(expenseRepository.findById("1")).thenReturn(existingExpense);
 
 		expenseController.updateExpense(updatedExpense);
@@ -240,7 +240,7 @@ public class ExpenseControlerTest {
 
 		Category existingCategory = new Category("1", "name1", "description1");
 
-		Expense updatedExpense = new Expense("1", 10000, "testExpense", LocalDate.now(), existingCategory);
+		Expense updatedExpense = new Expense("1", 10000d, "testExpense", LocalDate.now(), existingCategory);
 		when(expenseRepository.findById("1")).thenReturn(null);
 
 		expenseController.updateExpense(updatedExpense);
@@ -256,7 +256,7 @@ public class ExpenseControlerTest {
 		Category existingCategory = new Category("1", "name1", "description1");
 		when(categoryRepository.findById("1")).thenReturn(null);
 
-		Expense updatedExpense = new Expense("1", 10000, "testExpense", LocalDate.now(), existingCategory);
+		Expense updatedExpense = new Expense("1", 10000d, "testExpense", LocalDate.now(), existingCategory);
 		when(expenseRepository.findById("1")).thenReturn(updatedExpense);
 
 		expenseController.updateExpense(updatedExpense);
@@ -270,7 +270,7 @@ public class ExpenseControlerTest {
 	public void testUpdateExpenseWhenCategoryIsNull() {
 
 		
-		Expense updatedExpense = new Expense("1", 10000, "testExpense", LocalDate.now(), null);
+		Expense updatedExpense = new Expense("1", 10000d, "testExpense", LocalDate.now(), null);
 		when(expenseRepository.findById("1")).thenReturn(updatedExpense);
 
 		expenseController.updateExpense(updatedExpense);
@@ -286,7 +286,7 @@ public class ExpenseControlerTest {
 		Category existingCategory = new Category("1", "name1", "description1");
 		when(categoryRepository.findById("1")).thenReturn(existingCategory);
 
-		Expense updatedExpense = new Expense("1", 0, "testExpense", LocalDate.now(), existingCategory);
+		Expense updatedExpense = new Expense("1", 0d, "testExpense", LocalDate.now(), existingCategory);
 		when(expenseRepository.findById("1")).thenReturn(updatedExpense);
 
 		expenseController.updateExpense(updatedExpense);
@@ -302,7 +302,7 @@ public class ExpenseControlerTest {
 		Category existingCategory = new Category("1", "name1", "description1");
 		when(categoryRepository.findById("1")).thenReturn(existingCategory);
 
-		Expense updatedExpense = new Expense("1", -10000, "testExpense", LocalDate.now(), existingCategory);
+		Expense updatedExpense = new Expense("1", -10000d, "testExpense", LocalDate.now(), existingCategory);
 		when(expenseRepository.findById("1")).thenReturn(updatedExpense);
 
 		expenseController.updateExpense(updatedExpense);
@@ -317,7 +317,7 @@ public class ExpenseControlerTest {
 
 		Category existingCategory = new Category("1", "name1", "description1");
 		
-		Expense updatedExpense = new Expense("1", 10000, "", LocalDate.now(), existingCategory);
+		Expense updatedExpense = new Expense("1", 10000d, "", LocalDate.now(), existingCategory);
 		
 		expenseController.updateExpense(updatedExpense);
 
@@ -331,7 +331,7 @@ public class ExpenseControlerTest {
 
 		Category existingCategory = new Category("1", "name1", "description1");
 		
-		Expense updatedExpense = new Expense("1", 10000, "Description1", LocalDate.now().plusDays(10), existingCategory);
+		Expense updatedExpense = new Expense("1", 10000d, "Description1", LocalDate.now().plusDays(10), existingCategory);
 		
 		expenseController.updateExpense(updatedExpense);
 
@@ -345,7 +345,7 @@ public class ExpenseControlerTest {
 
 		Category existingCategory = new Category("1", "name1", "description1");
 		
-		Expense updatedExpense = new Expense("1", 10000, "Description1", null, existingCategory);
+		Expense updatedExpense = new Expense("1", 10000d, "Description1", null, existingCategory);
 		
 		expenseController.updateExpense(updatedExpense);
 

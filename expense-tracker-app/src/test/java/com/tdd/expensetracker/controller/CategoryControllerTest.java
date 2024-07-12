@@ -91,7 +91,7 @@ public class CategoryControllerTest {
 		when(categoryRepository.findById("1")).thenReturn(categoryToDelete);
 			categoryController.deleteCategory(categoryToDelete);
 		InOrder inOrder = inOrder(categoryRepository, categoryView);
-		inOrder.verify(categoryRepository).delete("1");
+		inOrder.verify(categoryRepository).delete(categoryToDelete);
 		inOrder.verify(categoryView).categoryDeleted("1");
 	}
 

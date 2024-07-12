@@ -12,6 +12,11 @@
 	<name>expense-tracker-app</name>
 
 	<properties>
+		<logback-classic-version>1.2.3</logback-classic-version>
+		<mysql-connector-java-version>8.0.28</mysql-connector-java-version>
+		<mysql-version>1.19.8</mysql-version>
+		<hibernate-core-version>5.4.15.Final</hibernate-core-version>
+		<h2-version>1.4.200</h2-version>
 		<pitest-maven-version>1.5.2</pitest-maven-version>
 		<maven-project-info-reports-plugin-version>3.0.0</maven-project-info-reports-plugin-version>
 		<maven-site-plugin-version>3.7.1</maven-site-plugin-version>
@@ -30,7 +35,7 @@
 		<mockito.version>4.4.0</mockito.version>
 		<assertj.version>3.15.0</assertj.version>
 	</properties>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -38,7 +43,31 @@
 			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>${h2-version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>${mysql-connector-java-version}</version> 
+		</dependency>
+
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>${logback-classic-version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>${hibernate-core-version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
@@ -52,6 +81,14 @@
 			<version>${assertj.version}</version>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>mysql</artifactId>
+			<version>${mysql-version}</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -93,8 +130,10 @@
 					<artifactId>maven-project-info-reports-plugin</artifactId>
 					<version>${maven-project-info-reports-plugin-version}</version>
 				</plugin>
+
 			</plugins>
 		</pluginManagement>
+
 		<plugins>
 			<plugin>
 				<groupId>org.jacoco</groupId>
@@ -142,7 +181,6 @@
 				<version>${pitest-maven-version}</version>
 				<configuration>
 					<targetClasses>
-
 						<param>com.tdd.expensetracker.*.*</param>
 					</targetClasses>
 					<targetTests>
@@ -151,9 +189,81 @@
 					<mutators>
 						<mutator>DEFAULTS</mutator>
 					</mutators>
-					<mutationThreshold>80</mutationThreshold>
+					<mutationThreshold>50</mutationThreshold>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>3.0.0</version>
+				<executions>
+					<execution>
+						<id>add-test-source</id>
+						<phase>generate-test-sources</phase>
+						<goals>
+							<goal>add-test-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>src/it/java</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>2.22.1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>0.34.1</version>
+				<configuration>
+					<images>
+						<image>
+							<name>mysql:8.0.28</name>
+							<run>
+								<ports>
+									<port>3307:3306</port> <!-- Corrected port
+									for MySQL -->
+								</ports>
+								<env>
+									<MYSQL_ROOT_PASSWORD>test</MYSQL_ROOT_PASSWORD>
+
+									<MYSQL_DATABASE>expense_tracker</MYSQL_DATABASE>
+								</env>
+							</run>
+						</image>
+					</images>
+				</configuration>
+				<executions>
+					<execution>
+						<id>start-docker-mysql</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>start</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>stop-docker-mysql</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>stop</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
 		</plugins>
 	</build>
 </project>

@@ -12,9 +12,9 @@ public interface ExpenseRepository {
 
 	public void save(Expense expense);
 
-	public void delete(String id);
-
 	public void update(Expense updatedExpense);
+
+	void delete(Expense expense);
 
 
 
