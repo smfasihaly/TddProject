@@ -54,7 +54,7 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>${mysql-connector-java-version}</version> 
+			<version>${mysql-connector-java-version}</version>
 		</dependency>
 
 		<dependency>
@@ -242,6 +242,11 @@
 
 									<MYSQL_DATABASE>expense_tracker</MYSQL_DATABASE>
 								</env>
+								<wait>
+									<log>ready for connections</log> <!-- Log message indicating MySQL is ready -->
+									<time>20000</time> <!-- Wait time may need to be adjusted based on typical startup time -->
+
+								</wait>
 							</run>
 						</image>
 					</images>
