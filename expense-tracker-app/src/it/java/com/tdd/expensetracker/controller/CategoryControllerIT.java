@@ -2,7 +2,6 @@ package com.tdd.expensetracker.controller;
 
 import static java.util.Arrays.asList;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.MetadataSources;
@@ -35,7 +34,7 @@ public class CategoryControllerIT {
 	@BeforeClass
 	public static void configureDB() {
 		registry = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml")
-				.applySetting("hibernate.connection.url", "jdbc:mysql://localhost:2375/expense_tracker")
+				.applySetting("hibernate.connection.url", "jdbc:mysql://localhost:3307/expense_tracker")
 				.applySetting("hibernate.connection.password", "test").build();
 
 	}

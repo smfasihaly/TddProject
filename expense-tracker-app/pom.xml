@@ -234,7 +234,7 @@
 							<name>mysql:8.0.28</name>
 							<run>
 								<ports>
-									<port>2375:3306</port> <!-- Corrected port
+									<port>3307:3306</port> <!-- Corrected port
 									for MySQL -->
 								</ports>
 								<env>
