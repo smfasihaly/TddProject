@@ -35,7 +35,7 @@ public class CategoryControllerIT {
 	@BeforeClass
 	public static void configureDB() {
 		registry = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml")
-				.applySetting("hibernate.connection.url", "jdbc:mysql://localhost:3307/expense_tracker")
+				.applySetting("hibernate.connection.url", "jdbc:mysql://localhost:2375/expense_tracker")
 				.applySetting("hibernate.connection.password", "test").build();
 
 	}
