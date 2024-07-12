@@ -243,9 +243,8 @@
 									<MYSQL_DATABASE>expense_tracker</MYSQL_DATABASE>
 								</env>
 								<wait>
-									<log>ready for connections</log> <!-- Log message indicating MySQL is ready -->
-									<time>40000</time> <!-- Wait time may need to be adjusted based on typical startup time -->
-
+									<log>MySQL Community Server - GPL</log>
+									<time>30000</time> <!-- Wait up to 30 seconds -->
 								</wait>
 							</run>
 						</image>
