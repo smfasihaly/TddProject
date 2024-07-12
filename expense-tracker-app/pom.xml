@@ -243,7 +243,7 @@
 									<MYSQL_DATABASE>expense_tracker</MYSQL_DATABASE>
 								</env>
 								<wait>
-									<log>MySQL Community Server - GPL</log>
+									<log>port: 3306  MySQL Community Server - GPL</log>
 									<time>30000</time> <!-- Wait up to 30 seconds -->
 								</wait>
 							</run>
