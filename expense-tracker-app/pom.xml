@@ -14,8 +14,9 @@
 	<properties>
 		<jdatepicker-version>1.3.4</jdatepicker-version>
 		<logback-classic-version>1.2.3</logback-classic-version>
-		<mysql-connector-java-version>8.0.28</mysql-connector-java-version>
-		<mysql-version>1.19.8</mysql-version>
+		
+		<mysql-version>8.0.33</mysql-version>
+		<mysql-testContainer-version>1.19.8</mysql-testContainer-version>
 		<hibernate-core-version>5.4.15.Final</hibernate-core-version>
 		<h2-version>1.4.200</h2-version>
 		<pitest-maven-version>1.5.2</pitest-maven-version>
@@ -62,7 +63,7 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>${mysql-connector-java-version}</version>
+			<version>${mysql-version}</version>
 		</dependency>
 
 		<dependency>
@@ -93,7 +94,7 @@
 		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>mysql</artifactId>
-			<version>${mysql-version}</version>
+			<version>${mysql-testContainer-version}</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -245,7 +246,7 @@
 				<configuration>
 					<images>
 						<image>
-							<name>mysql:8.0.28</name>
+							<name>mysql:${mysql-version}</name>
 							<run>
 								<ports>
 									<port>3307:3306</port> <!-- Corrected port
