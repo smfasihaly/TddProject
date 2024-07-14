@@ -1,14 +1,18 @@
 package com.tdd.expensetracker.view.swing;
 
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
@@ -30,17 +34,14 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
 
+import org.jdatepicker.impl.JDatePanelImpl;
+import org.jdatepicker.impl.JDatePickerImpl;
+import org.jdatepicker.impl.UtilDateModel;
+
 import com.tdd.expensetracker.controller.ExpenseController;
 import com.tdd.expensetracker.model.Category;
 import com.tdd.expensetracker.model.Expense;
 import com.tdd.expensetracker.view.ExpenseView;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-
-import org.jdatepicker.impl.JDatePanelImpl;
-import org.jdatepicker.impl.JDatePickerImpl;
-import org.jdatepicker.impl.UtilDateModel;
-import java.awt.Color;
 
 public class ExpenseSwingView extends JFrame implements ExpenseView {
 
@@ -101,8 +102,7 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 
 		comboBoxCategoriesModel = new DefaultComboBoxModel<Category>();
 		listExpenseModel = new DefaultListModel<Expense>();
-		// getComboCategoriesModel().addElement(new Category("2", "Bills",
-		// "Utilities"));
+		//getComboCategoriesModel().addElement(new Category("2", "Bills", "Utilities"));
 
 		setTitle("Expense");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -185,23 +185,36 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 		UtilDateModel model = new UtilDateModel();
 		JDatePanelImpl datePanel = new JDatePanelImpl(model, properties);
 		datePicker = new JDatePickerImpl(datePanel, new AbstractFormatter() {
-			private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			private static final long serialVersionUID = 1L;
 
 			@Override
 			public String valueToString(Object value) throws ParseException {
-
 				if (value != null) {
-					Calendar cal = (Calendar) value;
-					SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-					String strDate = format.format(cal.getTime());
-					return strDate;
+					if (value instanceof LocalDate) {
+						LocalDate localDate = (LocalDate) value;
+						value = convertToDateViaInstant(localDate); // Convert LocalDate to Calendar
+					}
+					if (value instanceof Calendar) {
+						Calendar cal = (Calendar) value;
+						SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+						return format.format(cal.getTime());
+					}
 				}
 				return "";
 			}
 
+			private Calendar convertToDateViaInstant(LocalDate dateToConvert) {
+				Date date = Date.from(dateToConvert.atStartOfDay(ZoneId.systemDefault()).toInstant());
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(date);
+				return cal;
+			}
+
 			@Override
 			public Object stringToValue(String text) throws ParseException {
-
+				if (text.isEmpty()) {
+					return null;
+				}
 				return LocalDate.parse(text);
 			}
 		});

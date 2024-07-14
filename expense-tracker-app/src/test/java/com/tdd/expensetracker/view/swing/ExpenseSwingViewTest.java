@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
 import java.time.LocalDate;
-import java.util.Timer;
 
 import javax.swing.DefaultListModel;
 
@@ -111,7 +110,7 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		descriptionTextBox.setText("");
 		amountTextBox.setText("");
 		descriptionTextBox.setText("");
-		datetextbox.setText("");
+		datetextbox.setText(null);
 		categoryComboBox.clearSelection();
 
 		descriptionTextBox.enterText("test");
@@ -123,19 +122,19 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		descriptionTextBox.setText("");
 		amountTextBox.setText("");
 		descriptionTextBox.setText("");
-		datetextbox.setText("");
+		datetextbox.setText(null);
 		categoryComboBox.clearSelection();
 
 		descriptionTextBox.enterText("test");
 		amountTextBox.enterText("100");
-		datetextbox.setText(" ");
+		datetextbox.setText(null);
 		categoryComboBox.selectItem(0);
 		window.button(JButtonMatcher.withText("Add Expense")).requireDisabled();
 
 		descriptionTextBox.setText("");
 		amountTextBox.setText("");
 		descriptionTextBox.setText("");
-		datetextbox.setText("");
+		datetextbox.setText(null);
 		categoryComboBox.clearSelection();
 
 		descriptionTextBox.enterText("test");
