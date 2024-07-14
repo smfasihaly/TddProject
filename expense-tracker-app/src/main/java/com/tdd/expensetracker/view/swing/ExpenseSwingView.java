@@ -5,12 +5,15 @@ import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -87,7 +90,6 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 	private JButton btnUpdateSelected;
 	private JButton btnUpdateExpense;
 	private JTextField txtID;
-	private JButton btnCancel;
 
 	DefaultListModel<Expense> getListExpenseModel() {
 		return listExpenseModel;
@@ -100,18 +102,8 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 
 		comboBoxCategoriesModel = new DefaultComboBoxModel<Category>();
 		listExpenseModel = new DefaultListModel<Expense>();
-		// getComboCategoriesModel().addElement(new Category("2", "Bills",
-		// "Utilities"));
-		
-		KeyAdapter btnAddEnabler = new KeyAdapter() {
-			@Override
-			public void keyReleased(KeyEvent e) {
-				setEnableAddOrUpdateButton();
+		//getComboCategoriesModel().addElement(new Category("2", "Bills", "Utilities"));
 
-			}
-
-		};
-		
 		setTitle("Expense");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
@@ -149,7 +141,6 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 
 		txtDescription = new JTextField();
 		txtDescription.setName("descriptionTextBox");
-		txtDescription.addKeyListener(btnAddEnabler);
 		GridBagConstraints gbc_txtDescription = new GridBagConstraints();
 		gbc_txtDescription.fill = GridBagConstraints.HORIZONTAL;
 		gbc_txtDescription.gridwidth = 3;
@@ -169,7 +160,6 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 
 		txtAmount = new JTextField();
 		txtAmount.setName("amountTextBox");
-		txtAmount.addKeyListener(btnAddEnabler);
 		GridBagConstraints gbc_txtAmount = new GridBagConstraints();
 		gbc_txtAmount.gridwidth = 3;
 		gbc_txtAmount.insets = new Insets(0, 0, 5, 0);
@@ -194,27 +184,30 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 
 		UtilDateModel model = new UtilDateModel();
 		JDatePanelImpl datePanel = new JDatePanelImpl(model, properties);
-		//to populate date from calendar to textBox
 		datePicker = new JDatePickerImpl(datePanel, new AbstractFormatter() {
-			
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			public String valueToString(Object value) throws ParseException {
-				if (isVisible())
-					setEnableAddOrUpdateButton();
 				if (value != null) {
 					if (value instanceof LocalDate) {
 						LocalDate localDate = (LocalDate) value;
 						value = convertToDateViaInstant(localDate); // Convert LocalDate to Calendar
 					}
-
-					Calendar cal = (Calendar) value;
-					SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-
-					return format.format(cal.getTime());
+					if (value instanceof Calendar) {
+						Calendar cal = (Calendar) value;
+						SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+						return format.format(cal.getTime());
+					}
 				}
 				return "";
+			}
+
+			private Calendar convertToDateViaInstant(LocalDate dateToConvert) {
+				Date date = Date.from(dateToConvert.atStartOfDay(ZoneId.systemDefault()).toInstant());
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(date);
+				return cal;
 			}
 
 			@Override
@@ -224,17 +217,8 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 				}
 				return LocalDate.parse(text);
 			}
-			
-			//convert localDate to calendar
-			private Calendar convertToDateViaInstant(LocalDate dateToConvert) {
-				Date date = Date.from(dateToConvert.atStartOfDay(ZoneId.systemDefault()).toInstant());
-				Calendar cal = Calendar.getInstance();
-				cal.setTime(date);
-				return cal;
-			}
 		});
 
-		datePicker.setName("datePicker");
 		datePicker.getJFormattedTextField().setBackground(new Color(255, 255, 255));
 		datePicker.getJFormattedTextField().setName("dateTextBox");
 
@@ -256,7 +240,6 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 
 		cbxCategory = new JComboBox<Category>(comboBoxCategoriesModel);
 		cbxCategory.setName("categoryComboBox");
-		cbxCategory.addItemListener(e -> setEnableAddOrUpdateButton());
 		GridBagConstraints gbc_cbxCategory = new GridBagConstraints();
 		gbc_cbxCategory.gridwidth = 3;
 		gbc_cbxCategory.insets = new Insets(0, 0, 5, 0);
@@ -268,6 +251,7 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 
 		btnAddExpense = new JButton("Add Expense");
 		btnAddExpense.addActionListener(e -> {
+
 			LocalDate date = LocalDate.parse(datePicker.getJFormattedTextField().getText().toString());
 			Category selectedCategory = comboBoxCategoriesModel.getElementAt(cbxCategory.getSelectedIndex());
 			Expense expense = new Expense(Double.parseDouble(txtAmount.getText()), txtDescription.getText(), date,
@@ -283,34 +267,33 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 		gbc_btnAddExpense.gridy = 5;
 		contentPane.add(btnAddExpense, gbc_btnAddExpense);
 
-		btnCancel = new JButton("Cancel");
-		btnCancel.addActionListener(e -> resetFormState());
-		btnCancel.setName("cancelButton");
-		btnCancel.setVisible(false);
-		GridBagConstraints gbc_btnCancel = new GridBagConstraints();
-		gbc_btnCancel.anchor = GridBagConstraints.EAST;
-		gbc_btnCancel.insets = new Insets(0, 0, 5, 5);
-		gbc_btnCancel.gridx = 1;
-		gbc_btnCancel.gridy = 6;
-		contentPane.add(btnCancel, gbc_btnCancel);
-
 		btnUpdateExpense = new JButton("Update Expense");
-		btnUpdateExpense.setVisible(false);
-		btnUpdateExpense.setEnabled(false);
 		btnUpdateExpense.setName("updateExpenseButton");
 		btnUpdateExpense.addActionListener(e -> {
-			LocalDate date = LocalDate.parse(datePicker.getJFormattedTextField().getText());
+
+			LocalDate date = LocalDate.parse(datePicker.getJFormattedTextField().getText(),
+					DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
 			Category selectedCategory = comboBoxCategoriesModel.getElementAt(cbxCategory.getSelectedIndex());
 			expenseController.updateExpense(new Expense(txtID.getText(), Double.parseDouble(txtAmount.getText()),
 					txtDescription.getText(), date, selectedCategory));
 
-			resetFormState();
+			txtID.setText("");
+			txtDescription.setText("");
+			txtAmount.setText("");
+			datePicker.getJFormattedTextField().setText("");
+			cbxCategory.setSelectedItem(null);
+
+			btnUpdateExpense.setVisible(false);
+			btnAddExpense.setEnabled(false);
+			btnAddExpense.setVisible(true);
 
 		});
+		btnUpdateExpense.setVisible(false);
 		GridBagConstraints gbc_btnUpdateExpense = new GridBagConstraints();
-		gbc_btnUpdateExpense.insets = new Insets(0, 0, 5, 5);
-		gbc_btnUpdateExpense.gridx = 2;
+		gbc_btnUpdateExpense.gridwidth = 4;
+		gbc_btnUpdateExpense.insets = new Insets(0, 0, 5, 0);
+		gbc_btnUpdateExpense.gridx = 0;
 		gbc_btnUpdateExpense.gridy = 6;
 		contentPane.add(btnUpdateExpense, gbc_btnUpdateExpense);
 
@@ -335,17 +318,18 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 
 		btnUpdateSelected = new JButton("Update Selected");
 		btnUpdateSelected.addActionListener(e -> {
-			btnAddExpense.setVisible(false);
-			btnUpdateExpense.setVisible(true);
-			btnCancel.setVisible(true);
 
 			Expense selectedExpense = expenseList.getSelectedValue();
 			txtID.setText(selectedExpense.getId());
 			txtDescription.setText(selectedExpense.getDescription());
 			txtAmount.setText(Double.toString(selectedExpense.getAmount()));
-			cbxCategory.setSelectedItem(selectedExpense.getCategory());
 			datePicker.getJFormattedTextField().setText(selectedExpense.getDate().toString());
-			datePicker.getModel().setSelected(true);
+			cbxCategory.setSelectedItem(selectedExpense.getCategory());
+
+			btnUpdateExpense.setVisible(true);
+			btnUpdateExpense.setEnabled(true);
+			btnAddExpense.setVisible(false);
+			btnAddExpense.setEnabled(false);
 		});
 
 		btnUpdateSelected.setEnabled(false);
@@ -357,7 +341,11 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 		contentPane.add(btnUpdateSelected, gbc_btnUpdateSelected);
 
 		btnDelete = new JButton("Delete Selected");
-		btnDelete.addActionListener(e -> expenseController.deleteExpense(expenseList.getSelectedValue()));
+		btnDelete.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				expenseController.deleteExpense(expenseList.getSelectedValue());
+			}
+		});
 		btnDelete.setEnabled(false);
 		btnDelete.setName("deleteButton");
 		GridBagConstraints gbc_btnDelete = new GridBagConstraints();
@@ -373,31 +361,40 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 		gbc_lblError.gridwidth = 4;
 		gbc_lblError.gridx = 0;
 		gbc_lblError.gridy = 10;
-		contentPane.add(lblError, gbc_lblError);	
-	}
+		contentPane.add(lblError, gbc_lblError);
 
-	private void resetFormState() {
-		txtID.setText("");
-		txtDescription.setText("");
-		txtAmount.setText("");
-		datePicker.getJFormattedTextField().setText("");
-		cbxCategory.setSelectedItem(null);
-		btnAddExpense.setEnabled(false);
-		btnAddExpense.setVisible(true);
-		btnUpdateExpense.setVisible(false);
-		btnCancel.setVisible(false);
+		KeyAdapter btnAddEnabler = new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				setEnableAddOrUpdateButton();
+
+			}
+
+		};
+
+		txtDescription.addKeyListener(btnAddEnabler);
+		txtAmount.addKeyListener(btnAddEnabler);
+
+		datePicker.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setEnableAddOrUpdateButton();
+			}
+		});
+		cbxCategory.addItemListener(e -> setEnableAddOrUpdateButton());
 	}
 
 	protected void setEnableAddOrUpdateButton() {
 
 		if (btnAddExpense.isVisible()) {
 			btnAddExpense.setEnabled(!txtDescription.getText().trim().isEmpty() && !txtAmount.getText().trim().isEmpty()
-					&& datePicker.getModel().getValue() != null && (cbxCategory.getSelectedItem() != null));
+					&& !datePicker.getJFormattedTextField().getText().trim().isEmpty()
+					&& (cbxCategory.getSelectedItem() != null));
 		}
 		if (btnUpdateExpense.isVisible()) {
 			btnUpdateExpense
 					.setEnabled(!txtDescription.getText().trim().isEmpty() && !txtAmount.getText().trim().isEmpty()
-							&& datePicker.getModel().getValue() != null && (cbxCategory.getSelectedItem() != null));
+							&& !datePicker.getJFormattedTextField().getText().trim().isEmpty()
+							&& (cbxCategory.getSelectedItem() != null));
 		}
 	}
 
