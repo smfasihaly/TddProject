@@ -200,7 +200,7 @@ public class ExpenseControlerTest {
 
 		InOrder inOrder = inOrder(expenseRepository, expenseView);
 		inOrder.verify(expenseRepository).delete(expenseToDelete);
-		inOrder.verify(expenseView).expenseDeleted("1");
+		inOrder.verify(expenseView).expenseDeleted(expenseToDelete);
 	}
 
 	@Test

@@ -6,18 +6,15 @@ import com.tdd.expensetracker.model.Expense;
 
 public interface ExpenseView {
 
-	void showAllExpense(Object all);
-
 	void showAllExpense(List<Expense> expense);
-
 
 	void expenseAdded(Expense expense);
 
 	void showError(String message, Expense existingExpense);
 
-	void expenseDeleted(String id);
+	void expenseDeleted(Expense expense);
 
-	void expenseUpdated(Expense existingExpense);
+	void expenseUpdated(Expense updatedExpense);
 
 
 }

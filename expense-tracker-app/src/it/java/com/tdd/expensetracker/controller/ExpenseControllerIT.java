@@ -111,7 +111,7 @@ public class ExpenseControllerIT {
 		expenseRepository.save(expenseToDelete);
 		expenseController.deleteExpense(expenseToDelete);
 		
-		verify(expenseView).expenseDeleted(expenseToDelete.getId());
+		verify(expenseView).expenseDeleted(expenseToDelete);
 	}
 
 	@Test

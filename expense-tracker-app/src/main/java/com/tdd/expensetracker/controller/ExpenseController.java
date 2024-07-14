@@ -64,7 +64,7 @@ public class ExpenseController {
 		}
  
 		expenseRepository.delete(expenseToDelete);
-		expenseView.expenseDeleted(expenseToDelete.getId());
+		expenseView.expenseDeleted(expenseToDelete);
 	}
 
 	public void updateExpense(Expense updatedExpense) {
