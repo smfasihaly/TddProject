@@ -102,7 +102,7 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 		listExpenseModel = new DefaultListModel<Expense>();
 		// getComboCategoriesModel().addElement(new Category("2", "Bills",
 		// "Utilities"));
-		
+
 		KeyAdapter btnAddEnabler = new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
@@ -111,10 +111,10 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 			}
 
 		};
-		
+
 		setTitle("Expense");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 450, 300);
+		setBounds(100, 100, 600, 300);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
@@ -194,9 +194,9 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 
 		UtilDateModel model = new UtilDateModel();
 		JDatePanelImpl datePanel = new JDatePanelImpl(model, properties);
-		//to populate date from calendar to textBox
+		// to populate date from calendar to textBox
 		datePicker = new JDatePickerImpl(datePanel, new AbstractFormatter() {
-			
+
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -224,8 +224,8 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 				}
 				return LocalDate.parse(text);
 			}
-			
-			//convert localDate to calendar
+
+			// convert localDate to calendar
 			private Calendar convertToDateViaInstant(LocalDate dateToConvert) {
 				Date date = Date.from(dateToConvert.atStartOfDay(ZoneId.systemDefault()).toInstant());
 				Calendar cal = Calendar.getInstance();
@@ -255,6 +255,7 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 		contentPane.add(lblCategory, gbc_lblCategory);
 
 		cbxCategory = new JComboBox<Category>(comboBoxCategoriesModel);
+		cbxCategory.setBackground(new Color(255, 255, 255));
 		cbxCategory.setName("categoryComboBox");
 		cbxCategory.addItemListener(e -> setEnableAddOrUpdateButton());
 		GridBagConstraints gbc_cbxCategory = new GridBagConstraints();
@@ -340,17 +341,21 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 			btnCancel.setVisible(true);
 
 			Expense selectedExpense = expenseList.getSelectedValue();
-			txtID.setText(selectedExpense.getId());
-			txtDescription.setText(selectedExpense.getDescription());
 			txtAmount.setText(Double.toString(selectedExpense.getAmount()));
 			cbxCategory.setSelectedItem(selectedExpense.getCategory());
 			datePicker.getJFormattedTextField().setText(selectedExpense.getDate().toString());
 			datePicker.getModel().setSelected(true);
+			txtID.setText(selectedExpense.getId());
+			txtDescription.setText(selectedExpense.getDescription());
+
+			setEnableAddOrUpdateButton();
+			
 		});
 
 		btnUpdateSelected.setEnabled(false);
 		btnUpdateSelected.setName("updateButton");
 		GridBagConstraints gbc_btnUpdateSelected = new GridBagConstraints();
+		gbc_btnUpdateSelected.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btnUpdateSelected.insets = new Insets(0, 0, 5, 5);
 		gbc_btnUpdateSelected.gridx = 1;
 		gbc_btnUpdateSelected.gridy = 9;
@@ -361,6 +366,7 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 		btnDelete.setEnabled(false);
 		btnDelete.setName("deleteButton");
 		GridBagConstraints gbc_btnDelete = new GridBagConstraints();
+		gbc_btnDelete.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btnDelete.insets = new Insets(0, 0, 5, 0);
 		gbc_btnDelete.gridwidth = 2;
 		gbc_btnDelete.gridx = 2;
@@ -373,7 +379,7 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 		gbc_lblError.gridwidth = 4;
 		gbc_lblError.gridx = 0;
 		gbc_lblError.gridy = 10;
-		contentPane.add(lblError, gbc_lblError);	
+		contentPane.add(lblError, gbc_lblError);
 	}
 
 	private void resetFormState() {

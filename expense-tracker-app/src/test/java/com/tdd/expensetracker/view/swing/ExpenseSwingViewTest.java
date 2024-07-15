@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import java.time.LocalDate;
 
 import javax.swing.DefaultListModel;
+import javax.swing.JTextField;
 
 import org.assertj.swing.annotation.GUITest;
 import org.assertj.swing.core.matcher.JButtonMatcher;
@@ -68,6 +69,11 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 	@Test
 	@GUITest
 	public void testControlsInitialStates() {
+
+		// Hidden id textBox
+		JTextField idTextBox = window.robot().finder().findByName("idTextBox", JTextField.class, false);
+		assertThat(idTextBox.isVisible()).isFalse();
+
 		window.label(JLabelMatcher.withText("Description"));
 		window.textBox("descriptionTextBox").requireEnabled();
 		window.label(JLabelMatcher.withText("Amount"));
@@ -81,13 +87,15 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Delete Selected")).requireDisabled();
 		window.button(JButtonMatcher.withText("Update Selected")).requireDisabled();
 		window.button(JButtonMatcher.withText("Update Expense")).requireNotVisible();
+		window.button(JButtonMatcher.withText("Cancel")).requireNotVisible();
+
 		window.label("errorMessageLabel").requireText(" ");
 	}
 
 	@Test
 	public void testWhenAllFieldsAreNonEmptyThenAddButtonShouldBeEnabled() {
 
-		setFieldValues("decription", "1000", LocalDate.now(), existingCategory);
+		setFieldValues("description", "1000", LocalDate.now(), existingCategory);
 		window.button(JButtonMatcher.withText("Add Expense")).requireEnabled();
 	}
 
@@ -105,19 +113,19 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		resetAllFieldsToBlank(descriptionTextBox, amountTextBox, datetextbox, categoryComboBox);
 
 		// empty Amount
-		setFieldValues("decription", "", LocalDate.now(), existingCategory);
+		setFieldValues("description", "", LocalDate.now(), existingCategory);
 		window.button(JButtonMatcher.withText("Add Expense")).requireDisabled();
 
 		resetAllFieldsToBlank(descriptionTextBox, amountTextBox, datetextbox, categoryComboBox);
 
 		// empty date
-		setFieldValues("decription", "1000", null, existingCategory);
+		setFieldValues("description", "1000", null, existingCategory);
 		window.button(JButtonMatcher.withText("Add Expense")).requireDisabled();
 
 		resetAllFieldsToBlank(descriptionTextBox, amountTextBox, datetextbox, categoryComboBox);
 
 		// empty category
-		setFieldValues("decription", "1000", LocalDate.now(), null);
+		setFieldValues("description", "1000", LocalDate.now(), null);
 		window.button(JButtonMatcher.withText("Add Expense")).requireDisabled();
 	}
 
@@ -139,6 +147,31 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		updateSelectedButton.requireDisabled();
 	}
 
+	@Test
+	public void testSelectedExpenseShouldPopulateAllFieldsWhenUpdateSeletedButtonIsClicked() {
+
+		Expense expense = new Expense("1", 5000d, "testExpense", LocalDate.now(), existingCategory);
+		GuiActionRunner.execute(() -> expenseSwingView.getListExpenseModel().addElement(expense));
+
+		window.list("expenseList").selectItem(0);
+
+		JButtonFixture updateSelectedButton = window.button(JButtonMatcher.withText("Update Selected"));
+		updateSelectedButton.click();
+
+		JTextComponentFixture descriptionTextBox = window.textBox("descriptionTextBox");
+		JTextComponentFixture amountTextBox = window.textBox("amountTextBox");
+		JTextComponentFixture datetextbox = window.textBox("dateTextBox");
+		JComboBoxFixture categoryComboBox = window.comboBox("categoryComboBox");
+		JTextField idTextBox = window.robot().finder().findByName("idTextBox", JTextField.class, false);
+		
+		assertThat(expense.getId()).isEqualTo(idTextBox.getText());
+		descriptionTextBox.requireText(expense.getDescription());
+		amountTextBox.requireText(Double.toString(expense.getAmount()));
+		datetextbox.requireText(expense.getDate().toString());
+		categoryComboBox.requireSelection(expense.getCategory().toString());
+
+	}
+	
 	@Test
 	public void testUpdateExpenseAndCancelButtonShouldBeVisibleAndAddExpenseButtonShouldBeHiddenWhenUpdateSeletedButtonIsClicked() {
 
@@ -214,7 +247,9 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Update Selected")).click();
 		window.textBox("descriptionTextBox").setText("updated description");
 		window.button(JButtonMatcher.withText("Update Expense")).click();
-
+		
+		JTextField idTextBox = window.robot().finder().findByName("idTextBox", JTextField.class, false);
+		assertThat("").isEqualTo(idTextBox.getText());
 		window.textBox("descriptionTextBox").requireText("");
 		window.textBox("amountTextBox").requireText("");
 		window.textBox("dateTextBox").requireText("");
@@ -231,6 +266,8 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Update Selected")).click();
 		window.button(JButtonMatcher.withText("Cancel")).click();
 
+		JTextField idTextBox = window.robot().finder().findByName("idTextBox", JTextField.class, false);
+		assertThat("").isEqualTo(idTextBox.getText());
 		window.textBox("descriptionTextBox").requireText("");
 		window.textBox("amountTextBox").requireText("");
 		window.textBox("dateTextBox").requireText("");
@@ -241,30 +278,7 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 
 	}
 
-	@Test
-	public void testSelectedExpenseShouldPopulateAllFieldsWhenUpdateSeletedButtonIsClicked() {
-
-		Expense expense = new Expense("1", 5000d, "testExpense", LocalDate.now(), existingCategory);
-		GuiActionRunner.execute(() -> expenseSwingView.getListExpenseModel().addElement(expense));
-
-		window.list("expenseList").selectItem(0);
-
-		JButtonFixture updateSelectedButton = window.button(JButtonMatcher.withText("Update Selected"));
-		updateSelectedButton.click();
-
-		JTextComponentFixture descriptionTextBox = window.textBox("descriptionTextBox");
-		JTextComponentFixture amountTextBox = window.textBox("amountTextBox");
-		JTextComponentFixture datetextbox = window.textBox("dateTextBox");
-		JComboBoxFixture categoryComboBox = window.comboBox("categoryComboBox");
-
-		descriptionTextBox.requireText(expense.getDescription());
-		amountTextBox.requireText(Double.toString(expense.getAmount()));
-		datetextbox.requireText(expense.getDate().toString());
-		categoryComboBox.requireSelection(expense.getCategory().toString());
-
-	}
-
-	//View Interface
+	// View Interface
 	@Test
 	public void testsShowAllExpensesShouldAddExpenseDescriptionsToTheList() {
 
@@ -363,7 +377,7 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 	}
 
 	@Test
-	public void testUpdateButtonShouldDelegateToExpenseControllerUpdateExpense() throws InterruptedException {
+	public void testUpdateButtonShouldDelegateToExpenseControllerUpdateExpense() {
 
 		Expense expense = new Expense("1", 5000d, "testExpense", LocalDate.now(), existingCategory);
 		GuiActionRunner.execute(() -> {

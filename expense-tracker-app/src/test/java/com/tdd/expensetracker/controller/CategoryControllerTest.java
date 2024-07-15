@@ -92,7 +92,7 @@ public class CategoryControllerTest {
 			categoryController.deleteCategory(categoryToDelete);
 		InOrder inOrder = inOrder(categoryRepository, categoryView);
 		inOrder.verify(categoryRepository).delete(categoryToDelete);
-		inOrder.verify(categoryView).categoryDeleted("1");
+		inOrder.verify(categoryView).categoryDeleted(categoryToDelete);
 	}
 
 	@Test

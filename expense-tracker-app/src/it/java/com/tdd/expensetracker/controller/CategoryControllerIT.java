@@ -93,7 +93,7 @@ public class CategoryControllerIT {
 		
 		categoryController.deleteCategory(categoryToDelete);
 		
-		verify(categoryView).categoryDeleted(categoryToDelete.getId());
+		verify(categoryView).categoryDeleted(categoryToDelete);
 	}
 	
 	@Test

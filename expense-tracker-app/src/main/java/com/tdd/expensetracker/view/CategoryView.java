@@ -10,10 +10,10 @@ public interface CategoryView {
 
 	void categoryAdded(Category category);
 
-	void showError(String id, Category existingCategory);
+	void showError(String message, Category category);
 
-	void categoryDeleted(String id);
+	void categoryDeleted(Category categoryToDelete);
 
-	void categoryUpdated(Category updatedCategory);
+	void categoryUpdated(Category categoryToUpdate);
 
 }
