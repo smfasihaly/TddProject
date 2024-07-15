@@ -4,6 +4,7 @@ import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
+import java.sql.Date;
 import java.time.LocalDate;
 
 import javax.swing.DefaultListModel;
@@ -18,7 +19,6 @@ import org.assertj.swing.fixture.JButtonFixture;
 import org.assertj.swing.fixture.JComboBoxFixture;
 import org.assertj.swing.fixture.JTextComponentFixture;
 import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
-import org.jdatepicker.impl.JDatePickerImpl;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -26,6 +26,8 @@ import org.mockito.MockitoAnnotations;
 import com.tdd.expensetracker.controller.ExpenseController;
 import com.tdd.expensetracker.model.Category;
 import com.tdd.expensetracker.model.Expense;
+import com.toedter.calendar.JDateChooser;
+import com.toedter.calendar.JTextFieldDateEditor;
 
 public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 
@@ -69,17 +71,19 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 	@Test
 	@GUITest
 	public void testControlsInitialStates() {
-
-		// Hidden id textBox
+		
 		JTextField idTextBox = window.robot().finder().findByName("idTextBox", JTextField.class, false);
 		assertThat(idTextBox.isVisible()).isFalse();
-
+		JDateChooser jdateChooser = window.robot().finder().findByName("JDateChooser", JDateChooser.class, false);
+		assertThat(jdateChooser.isVisible()).isTrue();
+		JTextFieldDateEditor dateEditor =(JTextFieldDateEditor) jdateChooser.getDateEditor();
+		assertThat(dateEditor.isEditable()).isFalse();
+		
 		window.label(JLabelMatcher.withText("Description"));
 		window.textBox("descriptionTextBox").requireEnabled();
 		window.label(JLabelMatcher.withText("Amount"));
 		window.textBox("amountTextBox").requireEnabled();
 		window.label(JLabelMatcher.withText("Date"));
-		window.textBox("dateTextBox").requireEnabled();
 		window.label(JLabelMatcher.withText("Category"));
 		window.comboBox("categoryComboBox").requireEnabled();
 		window.button(JButtonMatcher.withText("Add Expense")).requireDisabled();
@@ -101,32 +105,65 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 
 	@Test
 	public void testWhenAnyRequiredFieldsAreBlankThenAddButtonShouldBeDisabled() {
-		JTextComponentFixture descriptionTextBox = window.textBox("descriptionTextBox");
-		JTextComponentFixture amountTextBox = window.textBox("amountTextBox");
-		JTextComponentFixture datetextbox = window.textBox("dateTextBox");
-		JComboBoxFixture categoryComboBox = window.comboBox("categoryComboBox");
 
 		// empty Description
 		setFieldValues("", "1000", LocalDate.now(), existingCategory);
 		window.button(JButtonMatcher.withText("Add Expense")).requireDisabled();
 
-		resetAllFieldsToBlank(descriptionTextBox, amountTextBox, datetextbox, categoryComboBox);
+		resetAllFieldsToBlank();
 
 		// empty Amount
 		setFieldValues("description", "", LocalDate.now(), existingCategory);
 		window.button(JButtonMatcher.withText("Add Expense")).requireDisabled();
 
-		resetAllFieldsToBlank(descriptionTextBox, amountTextBox, datetextbox, categoryComboBox);
+		resetAllFieldsToBlank();
 
 		// empty date
 		setFieldValues("description", "1000", null, existingCategory);
 		window.button(JButtonMatcher.withText("Add Expense")).requireDisabled();
 
-		resetAllFieldsToBlank(descriptionTextBox, amountTextBox, datetextbox, categoryComboBox);
+		resetAllFieldsToBlank();
 
 		// empty category
 		setFieldValues("description", "1000", LocalDate.now(), null);
 		window.button(JButtonMatcher.withText("Add Expense")).requireDisabled();
+	}
+
+	@Test
+	public void testAmountFieldOnlyAcceptNumbers() {
+
+		JTextComponentFixture amountTxtBox = window.textBox("amountTextBox");
+
+		amountTxtBox.enterText("123456");
+		amountTxtBox.requireText("123456");
+
+		amountTxtBox.setText(null);
+
+		amountTxtBox.enterText("abcd");
+		amountTxtBox.requireText("");
+		
+		amountTxtBox.setText(null);
+
+		amountTxtBox.enterText("12abcd345");
+		amountTxtBox.requireText("12345");
+	}
+	
+	@Test
+	public void testFormShouldBeResetAfterAddingCategory() {
+
+		setFieldValues("description", "1000", LocalDate.now(), existingCategory);
+		window.button(JButtonMatcher.withText("Add Expense")).click();
+
+		JTextField idTextBox = window.robot().finder().findByName("idTextBox", JTextField.class, false);
+		assertThat("").isEqualTo(idTextBox.getText());
+		window.textBox("descriptionTextBox").requireText("");
+		window.textBox("amountTextBox").requireText("");
+		JDateChooser jdateChooser = window.robot().finder().findByName("JDateChooser", JDateChooser.class, false);
+		assertThat(jdateChooser.getDate()).isNull();
+		window.comboBox("categoryComboBox").requireNoSelection();
+		window.button(JButtonMatcher.withText("Add Expense")).requireDisabled();
+		window.button(JButtonMatcher.withText("Update Expense")).requireNotVisible();
+		window.button(JButtonMatcher.withText("Cancel")).requireNotVisible();
 	}
 
 	@Test
@@ -160,18 +197,18 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 
 		JTextComponentFixture descriptionTextBox = window.textBox("descriptionTextBox");
 		JTextComponentFixture amountTextBox = window.textBox("amountTextBox");
-		JTextComponentFixture datetextbox = window.textBox("dateTextBox");
+		JDateChooser jdateChooser = window.robot().finder().findByName("JDateChooser", JDateChooser.class, false);
 		JComboBoxFixture categoryComboBox = window.comboBox("categoryComboBox");
 		JTextField idTextBox = window.robot().finder().findByName("idTextBox", JTextField.class, false);
-		
+
 		assertThat(expense.getId()).isEqualTo(idTextBox.getText());
 		descriptionTextBox.requireText(expense.getDescription());
 		amountTextBox.requireText(Double.toString(expense.getAmount()));
-		datetextbox.requireText(expense.getDate().toString());
+		assertThat(jdateChooser.getDate()).isEqualTo(java.sql.Date.valueOf(LocalDate.now()));
 		categoryComboBox.requireSelection(expense.getCategory().toString());
 
 	}
-	
+
 	@Test
 	public void testUpdateExpenseAndCancelButtonShouldBeVisibleAndAddExpenseButtonShouldBeHiddenWhenUpdateSeletedButtonIsClicked() {
 
@@ -247,12 +284,13 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Update Selected")).click();
 		window.textBox("descriptionTextBox").setText("updated description");
 		window.button(JButtonMatcher.withText("Update Expense")).click();
-		
+
 		JTextField idTextBox = window.robot().finder().findByName("idTextBox", JTextField.class, false);
 		assertThat("").isEqualTo(idTextBox.getText());
 		window.textBox("descriptionTextBox").requireText("");
 		window.textBox("amountTextBox").requireText("");
-		window.textBox("dateTextBox").requireText("");
+		JDateChooser jdateChooser = window.robot().finder().findByName("JDateChooser", JDateChooser.class, false);
+		assertThat(jdateChooser.getDate()).isNull();
 		window.comboBox("categoryComboBox").requireNoSelection();
 		window.button(JButtonMatcher.withText("Add Expense")).requireDisabled();
 	}
@@ -270,7 +308,8 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		assertThat("").isEqualTo(idTextBox.getText());
 		window.textBox("descriptionTextBox").requireText("");
 		window.textBox("amountTextBox").requireText("");
-		window.textBox("dateTextBox").requireText("");
+		JDateChooser jdateChooser = window.robot().finder().findByName("JDateChooser", JDateChooser.class, false);
+		assertThat(jdateChooser.getDate()).isNull();
 		window.comboBox("categoryComboBox").requireNoSelection();
 		window.button(JButtonMatcher.withText("Add Expense")).requireDisabled();
 		window.button(JButtonMatcher.withText("Update Expense")).requireNotVisible();
@@ -397,7 +436,6 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 	}
 
 	private void setFieldValues(String description, String amount, LocalDate date, Category category) {
-		JDatePickerImpl datePicker = (JDatePickerImpl) window.robot().finder().findByName("datePicker");
 
 		window.textBox("descriptionTextBox").enterText(description);
 		window.textBox("amountTextBox").enterText(amount);
@@ -407,24 +445,25 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 			window.comboBox("categoryComboBox").clearSelection();
 		}
 		if (date != null) {
-			GuiActionRunner.execute(() -> {
 
-				datePicker.getModel().setDate(date.getYear(), date.getMonthValue() - 1, date.getDayOfMonth());
-				datePicker.getModel().setSelected(true);
+			JDateChooser jdateChooser = window.robot().finder().findByName("JDateChooser", JDateChooser.class, false);
+			GuiActionRunner.execute(() -> {
+				Date localDateToDate = java.sql.Date.valueOf(date);
+				jdateChooser.setDate(localDateToDate);
 			});
 		}
 	}
 
-	private void resetAllFieldsToBlank(JTextComponentFixture descriptionTextBox, JTextComponentFixture amountTextBox,
-			JTextComponentFixture datetextbox, JComboBoxFixture categoryComboBox) {
-		descriptionTextBox.setText("");
-		amountTextBox.setText("");
-		descriptionTextBox.setText("");
-		categoryComboBox.clearSelection();
-		JDatePickerImpl datePicker = (JDatePickerImpl) window.robot().finder().findByName("datePicker");
+	private void resetAllFieldsToBlank() {
+		window.textBox("descriptionTextBox").setText("");
+		window.textBox("amountTextBox").setText("");
+		window.textBox("descriptionTextBox").setText("");
+		window.comboBox("categoryComboBox").clearSelection();
+
+		JDateChooser jdateChooser = window.robot().finder().findByName("JDateChooser", JDateChooser.class, false);
 		GuiActionRunner.execute(() -> {
 
-			datePicker.getModel().setValue(null);
+			jdateChooser.setDate(null);
 		});
 	}
 }

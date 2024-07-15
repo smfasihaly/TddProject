@@ -12,9 +12,9 @@
 	<name>expense-tracker-app</name>
 
 	<properties>
-		<jdatepicker-version>1.3.4</jdatepicker-version>
+		<jcalendar-version>1.4</jcalendar-version>
 		<logback-classic-version>1.2.3</logback-classic-version>
-		
+
 		<mysql-version>8.0.33</mysql-version>
 		<mysql-testContainer-version>1.19.8</mysql-testContainer-version>
 		<hibernate-core-version>5.4.15.Final</hibernate-core-version>
@@ -39,6 +39,14 @@
 	</properties>
 
 	<dependencies>
+
+		<!-- https://mvnrepository.com/artifact/com.toedter/jcalendar -->
+		<dependency>
+			<groupId>com.toedter</groupId>
+			<artifactId>jcalendar</artifactId>
+			<version>${jcalendar-version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-swing-junit</artifactId>
@@ -98,11 +106,7 @@
 			<scope>test</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>org.jdatepicker</groupId>
-			<artifactId>jdatepicker</artifactId>
-			<version>${jdatepicker-version}</version>
-		</dependency>
+	
 
 	</dependencies>
 

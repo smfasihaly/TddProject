@@ -56,7 +56,7 @@ public class Category {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(description, expenses, id, name);
+		return Objects.hash(description, getExpenses(), id, name);
 	}
 
 	@Override
@@ -78,6 +78,14 @@ public class Category {
 
 	public String getDescription() {
 		return description;
+	}
+
+	public List<Expense> getExpenses() {
+		return expenses;
+	}
+
+	public void setExpenses(List<Expense> expenses) {
+		this.expenses = expenses;
 	}
 
 }
