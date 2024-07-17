@@ -121,7 +121,7 @@ public class ExpenseModelViewControllerIT extends AssertJSwingJUnitTestCase {
 
 		window.textBox("descriptionTextBox").setText(updatedexpense.getDescription());
 		window.button(JButtonMatcher.withText("Update Expense")).click();
-		await().atMost(15, TimeUnit.SECONDS).untilAsserted(
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(
 				() -> assertThat(assertThat(expenseRepository.findById(expense.getId())).isEqualTo(updatedexpense)));
 
 	}
@@ -136,7 +136,7 @@ public class ExpenseModelViewControllerIT extends AssertJSwingJUnitTestCase {
 		// ...with a expense to select
 		window.list().selectItem(0);
 		window.button(JButtonMatcher.withText("Delete Selected")).click();
-		await().atMost(15, TimeUnit.SECONDS).untilAsserted(
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(
 				() -> assertThat(expenseRepository.findById(expense.getId())).isNull());
 	}
 

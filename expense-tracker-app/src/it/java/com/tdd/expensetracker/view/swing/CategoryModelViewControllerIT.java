@@ -1,6 +1,9 @@
 package com.tdd.expensetracker.view.swing;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
+
+import java.util.concurrent.TimeUnit;
 
 import org.assertj.swing.core.matcher.JButtonMatcher;
 import org.assertj.swing.edt.GuiActionRunner;
@@ -77,6 +80,8 @@ public class CategoryModelViewControllerIT extends AssertJSwingJUnitTestCase {
 
 		setFieldValues("bills", "other");
 		window.button(JButtonMatcher.withText("Add Category")).click();
+
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> assertThat(categoryRepository.findAll()).isNotEmpty());
 		Category createdCategory = categoryRepository.findAll().get(0);
 		assertThat(categoryRepository.findById(createdCategory.getId()))
 				.isEqualTo(new Category(createdCategory.getId(), "bills", "other"));
@@ -94,7 +99,8 @@ public class CategoryModelViewControllerIT extends AssertJSwingJUnitTestCase {
 		// ...with a category to select
 		window.list().selectItem(0);
 		window.button(JButtonMatcher.withText("Delete Selected")).click();
-		assertThat(categoryRepository.findById(category.getId())).isNull();
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(
+				() -> assertThat(categoryRepository.findById(category.getId())).isNull());
 	}
 
 	@Test
@@ -112,8 +118,9 @@ public class CategoryModelViewControllerIT extends AssertJSwingJUnitTestCase {
 		window.textBox("descriptionTextBox").setText(updatedcategory.getDescription());
 		window.button(JButtonMatcher.withText("Update Category")).click();
 
-		assertThat(categoryRepository.findById(category.getId())).isEqualTo(updatedcategory);
-		
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(
+				() -> assertThat(categoryRepository.findById(category.getId())).isEqualTo(updatedcategory));
+
 	}
 
 	private void setFieldValues(String name, String description) {

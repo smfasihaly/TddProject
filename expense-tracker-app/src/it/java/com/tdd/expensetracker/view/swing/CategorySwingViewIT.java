@@ -1,8 +1,10 @@
 package com.tdd.expensetracker.view.swing;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 
 import java.time.LocalDate;
+import java.util.concurrent.TimeUnit;
 
 import org.assertj.swing.annotation.GUITest;
 import org.assertj.swing.core.matcher.JButtonMatcher;
@@ -101,6 +103,9 @@ public class CategorySwingViewIT extends AssertJSwingJUnitTestCase {
 
 		setFieldValues("bills", "other");
 		window.button(JButtonMatcher.withText("Add Category")).click();
+		
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> assertThat(categoryRepository.findAll()).isNotEmpty());
+		
 		Category createdCategory = categoryRepository.findAll().get(0);
 		assertThat(window.list().contents())
 				.containsExactlyInAnyOrder(new Category(createdCategory.getId(), "bills", "other").toString());
@@ -117,6 +122,8 @@ public class CategorySwingViewIT extends AssertJSwingJUnitTestCase {
 		setFieldValues("bills", "other");
 
 		window.button(JButtonMatcher.withText("Add Category")).click();
+		await().atMost(5, TimeUnit.SECONDS)
+		.untilAsserted(() -> assertThat(window.label("errorMessageLabel").text().trim()).isNotEmpty());
 		assertThat(window.list().contents()).isEmpty();
 
 		window.label("errorMessageLabel").requireText("Already existing category with name " + category.getName() + ": "
@@ -134,7 +141,7 @@ public class CategorySwingViewIT extends AssertJSwingJUnitTestCase {
 		// ...with a category to select
 		window.list().selectItem(0);
 		window.button(JButtonMatcher.withText("Delete Selected")).click();
-		assertThat(window.list().contents()).isEmpty();
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() ->assertThat(window.list().contents()).isEmpty());
 	}
 
 	@Test
@@ -145,6 +152,8 @@ public class CategorySwingViewIT extends AssertJSwingJUnitTestCase {
 		GuiActionRunner.execute(() -> categorySwingView.getListCategoryModel().addElement(category));
 		window.list().selectItem(0);
 		window.button(JButtonMatcher.withText("Delete Selected")).click();
+		await().atMost(5, TimeUnit.SECONDS)
+		.untilAsserted(() -> assertThat(window.label("errorMessageLabel").text().trim()).isNotEmpty());
 
 		assertThat(window.list().contents()).containsExactly(category.toString());
 		window.label("errorMessageLabel").requireText("Category does not exist with id 1: " + category);
@@ -164,7 +173,8 @@ public class CategorySwingViewIT extends AssertJSwingJUnitTestCase {
 		window.textBox("descriptionTextBox").setText(updatedcategory.getDescription());
 		window.button(JButtonMatcher.withText("Update Category")).click();
 
-		assertThat(window.list().contents()).containsExactly(updatedcategory.toString());
+		await().atMost(5, TimeUnit.SECONDS)
+		.untilAsserted(() -> assertThat(window.list().contents()).containsExactly(updatedcategory.toString()));
 
 	}
 
@@ -189,6 +199,11 @@ public class CategorySwingViewIT extends AssertJSwingJUnitTestCase {
 		window.textBox("nameTextBox").setText("bills");
 
 		window.button(JButtonMatcher.withText("Update Category")).click();
+		
+		await().atMost(5, TimeUnit.SECONDS)
+		.untilAsserted(() -> assertThat(window.label("errorMessageLabel").text().trim()).isNotEmpty());
+
+
 
 		assertThat(window.list().contents()).containsExactly(category.toString(), category1.toString());
 

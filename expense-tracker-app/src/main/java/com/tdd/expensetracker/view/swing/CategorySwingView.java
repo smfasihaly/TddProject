@@ -190,12 +190,7 @@ public class CategorySwingView extends JFrame implements CategoryView {
 		btnAddCategory = new JButton("Add Category");
 		btnAddCategory.addActionListener(e -> {
 			new Thread(() -> {
-				try {
-					Thread.sleep(1000l);
-				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+				
 				Category category = new Category(txtName.getText(), txtDescription.getText());
 				categoryController.newCategory(category);
 				resetFormState();
@@ -224,12 +219,7 @@ public class CategorySwingView extends JFrame implements CategoryView {
 		btnUpdateCategory = new JButton("Update Category");
 		btnUpdateCategory.addActionListener(e -> {
 			new Thread(() -> {
-				try {
-					Thread.sleep(1000l);
-				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+				
 				Category category = new Category(txtID.getText(), txtName.getText(), txtDescription.getText());
 				categoryController.updateCategory(category);
 				resetFormState();
@@ -330,12 +320,7 @@ public class CategorySwingView extends JFrame implements CategoryView {
 		btnDeleteSelected = new JButton("Delete Selected");
 		btnDeleteSelected.addActionListener(e -> {
 			new Thread(() -> {
-				try {
-					Thread.sleep(1000l);
-				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+				
 				categoryController.deleteCategory(categoryList.getSelectedValue());
 			}).start();
 		});

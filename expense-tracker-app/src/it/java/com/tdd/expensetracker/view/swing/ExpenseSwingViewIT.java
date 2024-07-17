@@ -119,7 +119,7 @@ public class ExpenseSwingViewIT extends AssertJSwingJUnitTestCase {
 
 		setFieldValues("testExpense", "5000", LocalDate.now(), category);
 		window.button(JButtonMatcher.withText("Add Expense")).click();
-		await().atMost(15, TimeUnit.SECONDS).untilAsserted(() -> assertThat(expenseRepository.findAll()).isNotEmpty());
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> assertThat(expenseRepository.findAll()).isNotEmpty());
 		Expense createdExpense = expenseRepository.findAll().get(0);
 		assertThat(window.list().contents()).containsExactly(
 				new Expense(createdExpense.getId(), 5000d, "testExpense", LocalDate.now(), category).toString());
@@ -180,7 +180,7 @@ public class ExpenseSwingViewIT extends AssertJSwingJUnitTestCase {
 
 		window.textBox("descriptionTextBox").setText(updatedexpense.getDescription());
 		window.button(JButtonMatcher.withText("Update Expense")).click();
-		await().atMost(15, TimeUnit.SECONDS)
+		await().atMost(5, TimeUnit.SECONDS)
 				.untilAsserted(() -> assertThat(window.list().contents()).containsExactly(updatedexpense.toString()));
 
 	}
