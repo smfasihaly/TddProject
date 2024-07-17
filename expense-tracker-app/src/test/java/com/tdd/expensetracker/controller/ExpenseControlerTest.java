@@ -354,5 +354,17 @@ public class ExpenseControlerTest {
 
 	}
 	
+	@Test
+	public void testAllCategory() {
+
+		List<Category> categories = Arrays.asList(new Category());
+		when(categoryRepository.findAll()).thenReturn(categories);
+
+		expenseController.allCategory();
+
+		verify(expenseView).showAllCategory(categories);
+	}
+
+	
 
 }

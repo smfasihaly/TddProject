@@ -27,7 +27,7 @@ public class Category {
 	private String name;
 	private String description;
 
-	@OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private List<Expense> expenses = new ArrayList<>();
 
 	public Category(String id, String name, String description) {

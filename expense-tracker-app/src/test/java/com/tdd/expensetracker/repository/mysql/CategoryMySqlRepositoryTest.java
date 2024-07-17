@@ -80,6 +80,26 @@ public class CategoryMySqlRepositoryTest {
 
 		Assertions.assertThat(actual).isEqualTo(expected);
 	}
+	
+	@Test
+	public void testFindByNameNotFound() {
+		Assertions.assertThat(categoryMySqlRepository.findByName("fasih")).isNull();
+	}
+	
+	@Test
+	public void testFindByNameFound() {
+
+		Category category = new Category("name1", "description1");
+		Category category2 = new Category("name2", "description2");
+
+		String id1 = addTestCategoryToDatabase(category);
+		addTestCategoryToDatabase(category2);
+
+		String expected = new Category(id1, "name1", "description1").toString();
+		String actual = categoryMySqlRepository.findByName("name1").toString();
+
+		Assertions.assertThat(actual).isEqualTo(expected);
+	}
 
 	@Test
 	public void testSave() {

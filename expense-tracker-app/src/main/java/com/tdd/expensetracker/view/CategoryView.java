@@ -3,6 +3,7 @@ package com.tdd.expensetracker.view;
 import java.util.List;
 
 import com.tdd.expensetracker.model.Category;
+import com.tdd.expensetracker.model.Expense;
 
 public interface CategoryView {
 
@@ -15,5 +16,9 @@ public interface CategoryView {
 	void categoryDeleted(Category categoryToDelete);
 
 	void categoryUpdated(Category categoryToUpdate);
+
+	void getAllExpenses(List<Expense> expenses);
+	
+
 
 }

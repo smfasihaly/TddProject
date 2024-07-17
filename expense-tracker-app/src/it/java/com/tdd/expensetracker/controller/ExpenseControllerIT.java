@@ -2,7 +2,6 @@ package com.tdd.expensetracker.controller;
 
 import static java.util.Arrays.asList;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 
@@ -23,13 +22,14 @@ import com.tdd.expensetracker.model.Category;
 import com.tdd.expensetracker.model.Expense;
 import com.tdd.expensetracker.repository.CategoryRepository;
 import com.tdd.expensetracker.repository.ExpenseRepository;
+import com.tdd.expensetracker.repository.mysql.CategoryMySqlRepository;
 import com.tdd.expensetracker.repository.mysql.ExpenseMysqlRepository;
 import com.tdd.expensetracker.view.ExpenseView;
 
 public class ExpenseControllerIT {
 
 	private ExpenseRepository expenseRepository;
-	@Mock
+	
 	private CategoryRepository categoryRepository;
 	@Mock
 	private ExpenseView expenseView;
@@ -45,7 +45,7 @@ public class ExpenseControllerIT {
 	
 	@BeforeClass
 	public static void configureDB() {
-		registry = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml")
+		registry = new StandardServiceRegistryBuilder().configure("hibernate-IT.cfg.xml")
 				.applySetting("hibernate.connection.url", "jdbc:mysql://localhost:3307/expense_tracker")
 				.applySetting("hibernate.connection.password", "test").build();
 
@@ -69,6 +69,7 @@ public class ExpenseControllerIT {
 		sessionFactory = metadataSources.buildMetadata().buildSessionFactory();
 		
 		expenseRepository = new ExpenseMysqlRepository(sessionFactory);
+		categoryRepository = new CategoryMySqlRepository(sessionFactory);
 		expenseController = new ExpenseController(expenseView, expenseRepository, categoryRepository);
 		
 		existingCategory = new Category("name1", "description1");
@@ -95,8 +96,6 @@ public class ExpenseControllerIT {
 	@Test
 	public void testNewExpense() {
 
-		when(categoryRepository.findById(existingCategory.getId())).thenReturn(existingCategory);
-
 		Expense expense = new Expense(5000d, "testExpense", LocalDate.now(), existingCategory);
 		expenseController.newExpense(expense);
 
@@ -117,8 +116,6 @@ public class ExpenseControllerIT {
 	@Test
 	public void testUpdate() {
 
-		when(categoryRepository.findById(existingCategory.getId())).thenReturn(existingCategory);
-		
 		Expense expenseToUpdate = new Expense( 5000d, "testExpense", LocalDate.now(), existingCategory);
 		expenseRepository.save(expenseToUpdate);
 

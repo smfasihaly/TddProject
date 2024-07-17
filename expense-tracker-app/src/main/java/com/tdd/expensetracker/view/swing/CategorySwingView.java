@@ -2,11 +2,10 @@ package com.tdd.expensetracker.view.swing;
 
 import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -24,8 +23,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.table.AbstractTableModel;
 
 import com.tdd.expensetracker.controller.CategoryController;
 import com.tdd.expensetracker.model.Category;
@@ -51,17 +52,22 @@ public class CategorySwingView extends JFrame implements CategoryView {
 	private JList<Category> categoryList;
 	private JButton btnUpdateCategory;
 	private JButton btnCancel;
-	private final JLabel lblError = new JLabel(" ");
+	private JLabel lblError;
 
 	private DefaultListModel<Category> listCategoryModel;
+	private DefaultListModel<Expense> listExpenseModel;
+
 	private JTextField txtID;
 	private CategoryController categoryController;
 	private JTable expenseTable;
-	private DefaultTableModel tableModel;
 	private JLabel lblHideTable;
 
 	DefaultListModel<Category> getListCategoryModel() {
 		return listCategoryModel;
+	}
+
+	DefaultListModel<Expense> getListExpenseModel() {
+		return listExpenseModel;
 	}
 
 	public void setCategoryController(CategoryController categoryController) {
@@ -88,7 +94,9 @@ public class CategorySwingView extends JFrame implements CategoryView {
 	 * Create the frame.
 	 */
 	public CategorySwingView() {
+
 		listCategoryModel = new DefaultListModel<Category>();
+		listExpenseModel = new DefaultListModel<Expense>();
 //		Category categorysample = new Category("1", "name", "description");
 //		categorysample.setExpenses(asList(new Expense(5000d, "name", LocalDate.now(), null)));
 //		Category categorysample2 = new Category("2", "nam2e", "de2s2c2ription");
@@ -181,9 +189,17 @@ public class CategorySwingView extends JFrame implements CategoryView {
 
 		btnAddCategory = new JButton("Add Category");
 		btnAddCategory.addActionListener(e -> {
-			Category category = new Category(txtName.getText(), txtDescription.getText());
-			categoryController.newCategory(category);
-			resetFormState();
+			new Thread(() -> {
+				try {
+					Thread.sleep(1000l);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				Category category = new Category(txtName.getText(), txtDescription.getText());
+				categoryController.newCategory(category);
+				resetFormState();
+			}).start();
 		});
 		btnAddCategory.setEnabled(false);
 		btnAddCategory.setName("categoryButton");
@@ -207,9 +223,17 @@ public class CategorySwingView extends JFrame implements CategoryView {
 
 		btnUpdateCategory = new JButton("Update Category");
 		btnUpdateCategory.addActionListener(e -> {
-			Category category = new Category(txtID.getText(), txtName.getText(), txtDescription.getText());
-			categoryController.updateCategory(category);
-			resetFormState();
+			new Thread(() -> {
+				try {
+					Thread.sleep(1000l);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				Category category = new Category(txtID.getText(), txtName.getText(), txtDescription.getText());
+				categoryController.updateCategory(category);
+				resetFormState();
+			}).start();
 		});
 		btnUpdateCategory.setEnabled(false);
 		btnUpdateCategory.setVisible(false);
@@ -250,35 +274,21 @@ public class CategorySwingView extends JFrame implements CategoryView {
 		btnShowExpenses = new JButton("Show Expenses");
 		btnShowExpenses.addActionListener(e -> {
 			Category selectedCategory = categoryList.getSelectedValue();
-			if (selectedCategory != null) {
-				List<Expense> listExpense = selectedCategory.getExpenses();
+			categoryController.getAllExpenses(selectedCategory);
 
-				// Create the table model with the new expense data
-				Object[][] expenseData = new Object[listExpense.size()][3];
-				for (int i = 0; i < listExpense.size(); i++) {
-					expenseData[i][0] = listExpense.get(i).getDescription();
-					expenseData[i][1] = listExpense.get(i).getAmount();
-					expenseData[i][2] = listExpense.get(i).getDate();
-				}
-
-				tableModel = new DefaultTableModel( expenseData, new String[] { "Description", "Amount", "Date" });
-
-				// Set the new table model to the expense table
-				expenseTable.setModel(tableModel);
-
-				scrollPane1.setVisible(true);
-				lblHideTable.setVisible(true);
-			}
+			scrollPane1.setVisible(true);
+			lblHideTable.setVisible(true);
 
 		});
-		
+
 		lblHideTable = new JLabel("X");
 		lblHideTable.addMouseListener(new MouseAdapter() {
+
 			@Override
 			public void mouseClicked(MouseEvent e) {
-			 scrollPane1.setVisible(false);
-			 lblHideTable.setVisible(false);
-			 
+				scrollPane1.setVisible(false);
+				lblHideTable.setVisible(false);
+
 			}
 		});
 		lblHideTable.setForeground(new Color(237, 51, 59));
@@ -318,10 +328,16 @@ public class CategorySwingView extends JFrame implements CategoryView {
 		contentPane.add(btnUpdateSelected, gbc_btnDeleteSelected);
 
 		btnDeleteSelected = new JButton("Delete Selected");
-		btnDeleteSelected.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		btnDeleteSelected.addActionListener(e -> {
+			new Thread(() -> {
+				try {
+					Thread.sleep(1000l);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				categoryController.deleteCategory(categoryList.getSelectedValue());
-			}
+			}).start();
 		});
 		btnDeleteSelected.setEnabled(false);
 		btnDeleteSelected.setName("deleteSelectedButton");
@@ -331,18 +347,28 @@ public class CategorySwingView extends JFrame implements CategoryView {
 		gbc_btnDeleteSelected1.gridx = 4;
 		gbc_btnDeleteSelected1.gridy = 7;
 		contentPane.add(btnDeleteSelected, gbc_btnDeleteSelected1);
+
+		lblError = new JLabel(" ");
+		lblError.setHorizontalAlignment(SwingConstants.LEFT);
+		lblError.setFont(new Font("Dialog", Font.BOLD, 12));
+		lblError.setBackground(new Color(255, 255, 255));
+		lblError.setForeground(new Color(237, 51, 59));
+		lblError.setName("errorMessageLabel");
 		GridBagConstraints gbc_lblError = new GridBagConstraints();
 		gbc_lblError.insets = new Insets(0, 0, 0, 5);
 		gbc_lblError.gridx = 0;
 		gbc_lblError.gridy = 8;
+		lblError.setForeground(new Color(237, 51, 59));
 		lblError.setName("errorMessageLabel");
 		contentPane.add(lblError, gbc_lblError);
 
 		// Create the table and set its model
-		expenseTable = new JTable(tableModel);
+		expenseTable = new JTable();
 		expenseTable.setName("expenseTable");
 		expenseTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		expenseTable.setRowSelectionAllowed(true); // Allow row selection
+		// Create the table model with the new expense data as an anonymous inner class
+		createTableModel();
 
 		GridBagConstraints gbc_expenseTable = new GridBagConstraints();
 		gbc_expenseTable.gridwidth = 4;
@@ -351,6 +377,7 @@ public class CategorySwingView extends JFrame implements CategoryView {
 		gbc_expenseTable.gridx = 1;
 		gbc_expenseTable.gridy = 8;
 		scrollPane1 = new JScrollPane();
+
 		scrollPane1.setVisible(false);
 		scrollPane1.setName("scrollPaneExpenseTable");
 
@@ -365,16 +392,57 @@ public class CategorySwingView extends JFrame implements CategoryView {
 
 	}
 
+	private void createTableModel() {
+		AbstractTableModel tableModel = new AbstractTableModel() {
+			private static final long serialVersionUID = 1L;
+			private final String[] columnNames = { "Description", "Amount", "Date" };
+
+			@Override
+			public int getRowCount() {
+				return listExpenseModel.getSize();
+			}
+
+			@Override
+			public int getColumnCount() {
+				return columnNames.length;
+			}
+
+			@Override
+			public String getColumnName(int columnIndex) {
+				return columnNames[columnIndex];
+			}
+
+			@Override
+			public Object getValueAt(int rowIndex, int columnIndex) {
+				Expense expense = listExpenseModel.getElementAt(rowIndex);
+				switch (columnIndex) {
+				case 0:
+					return expense.getDescription();
+				case 1:
+					return expense.getAmount();
+				case 2:
+					return expense.getDate();
+				default:
+					return null;
+				}
+			}
+		};
+
+		// Set the new table model to the expense table
+		expenseTable.setModel(tableModel);
+	}
+
 	protected void resetFormState() {
-		txtID.setText("");
-		txtDescription.setText("");
-		txtName.setText("");
+		SwingUtilities.invokeLater(() -> {
+			txtID.setText("");
+			txtDescription.setText("");
+			txtName.setText("");
 
-		btnAddCategory.setEnabled(false);
-		btnAddCategory.setVisible(true);
-		btnUpdateCategory.setVisible(false);
-		btnCancel.setVisible(false);
-
+			btnAddCategory.setEnabled(false);
+			btnAddCategory.setVisible(true);
+			btnUpdateCategory.setVisible(false);
+			btnCancel.setVisible(false);
+		});
 	}
 
 	@Override
@@ -385,11 +453,18 @@ public class CategorySwingView extends JFrame implements CategoryView {
 	}
 
 	@Override
-	public void categoryAdded(Category category) {
+	public void getAllExpenses(List<Expense> categoryExpenses) {
 
-		listCategoryModel.addElement(category);
+		categoryExpenses.stream().forEach(listExpenseModel::addElement);
 		resetErrorLabel();
+	}
 
+	@Override
+	public void categoryAdded(Category category) {
+		SwingUtilities.invokeLater(() -> {
+			listCategoryModel.addElement(category);
+			resetErrorLabel();
+		});
 	}
 
 	private void resetErrorLabel() {
@@ -398,22 +473,32 @@ public class CategorySwingView extends JFrame implements CategoryView {
 
 	@Override
 	public void showError(String message, Category category) {
-		lblError.setText(message + ": " + category);
-
+		SwingUtilities.invokeLater(() -> {
+			lblError.setText(message + ": " + category);
+		});
 	}
 
 	@Override
 	public void categoryDeleted(Category categoryToDelete) {
-		listCategoryModel.removeElement(categoryToDelete);
-		resetErrorLabel();
+		SwingUtilities.invokeLater(() -> {
+			listCategoryModel.removeElement(categoryToDelete);
+			resetErrorLabel();
+		});
 
 	}
 
 	@Override
 	public void categoryUpdated(Category categoryToUpdate) {
-		int index = IntStream.range(0, listCategoryModel.size())
-				.filter(i -> listCategoryModel.get(i).getId() == categoryToUpdate.getId()).findFirst().orElse(-1);
-		listCategoryModel.set(index, categoryToUpdate);
+		SwingUtilities.invokeLater(() -> {
+			int index = IntStream.range(0, listCategoryModel.size())
+					.filter(i -> (listCategoryModel.get(i).getId()).equals(categoryToUpdate.getId())).findFirst()
+					.orElse(-1);
+
+			if (index == -1)
+				return;
+			listCategoryModel.set(index, categoryToUpdate);
+			resetErrorLabel();
+		});
 	}
 
 }

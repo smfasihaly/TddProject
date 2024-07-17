@@ -10,6 +10,8 @@ public interface CategoryRepository {
 
 	public Category findById(String id);
 
+	public Category findByName(String name);
+
 	public void save(Category category);
 
 	public void delete(Category category);

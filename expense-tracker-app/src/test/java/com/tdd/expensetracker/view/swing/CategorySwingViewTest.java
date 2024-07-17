@@ -2,9 +2,12 @@ package com.tdd.expensetracker.view.swing;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.verify;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JScrollPane;
@@ -74,6 +77,7 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 		window.label(JLabelMatcher.withText("X")).requireNotVisible();
 		window.button(JButtonMatcher.withText("Delete Selected")).requireDisabled();
 		window.button(JButtonMatcher.withText("Update Selected")).requireDisabled();
+		window.button(JButtonMatcher.withText("Show Expenses")).requireDisabled();
 		window.button(JButtonMatcher.withText("Update Category")).requireNotVisible();
 		window.button(JButtonMatcher.withText("Cancel")).requireNotVisible();
 		window.label("errorMessageLabel").requireText(" ");
@@ -101,11 +105,10 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 		setFieldValues("name", "description");
 
 		window.button(JButtonMatcher.withText("Add Category")).click();
-
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> window.textBox("descriptionTextBox").requireText(""));
 		JTextField idTextBox = window.robot().finder().findByName("idTextBox", JTextField.class, false);
 		assertThat("").isEqualTo(idTextBox.getText());
 		window.textBox("nameTextBox").requireText("");
-		window.textBox("descriptionTextBox").requireText("");
 		window.button(JButtonMatcher.withText("Add Category")).requireDisabled();
 	}
 
@@ -165,9 +168,9 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 		JButtonFixture cancelButton = window.button(JButtonMatcher.withText("Cancel"));
 
 		addButton.requireNotVisible();
-		updateButton.requireEnabled();
 		cancelButton.requireEnabled();
 		updateButton.requireVisible();
+		updateButton.requireEnabled();
 
 	}
 
@@ -181,13 +184,14 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 		JButtonFixture updateSelectedButton = window.button(JButtonMatcher.withText("Update Selected"));
 		updateSelectedButton.click();
 
+		window.textBox("descriptionTextBox").enterText(" changed");
 		window.button(JButtonMatcher.withText("Update Category")).requireEnabled();
 
+		// setting required field empty and enter whitespaces
 		window.textBox("nameTextBox").setText("");
-		window.textBox("descriptionTextBox").setText("");
+		window.textBox("nameTextBox").enterText("  ");
 
 		// empty Name
-		setFieldValues("", "1000");
 		window.button(JButtonMatcher.withText("Update Category")).requireDisabled();
 	}
 
@@ -203,7 +207,7 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 
 		JButtonFixture updateButton = window.button(JButtonMatcher.withText("Update Category"));
 		updateButton.click();
-		updateButton.requireNotVisible();
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> updateButton.requireNotVisible());
 
 		JButtonFixture cancelButton = window.button(JButtonMatcher.withText("Cancel"));
 		cancelButton.requireNotVisible();
@@ -227,7 +231,7 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Update Category")).click();
 
 		JTextField idTextBox = window.robot().finder().findByName("idTextBox", JTextField.class, false);
-		assertThat("").isEqualTo(idTextBox.getText());
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> assertThat("").isEqualTo(idTextBox.getText()));
 		window.textBox("nameTextBox").requireText("");
 		window.textBox("descriptionTextBox").requireText("");
 		window.button(JButtonMatcher.withText("Add Category")).requireDisabled();
@@ -273,18 +277,20 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 	public void testExpenseTableShouldBePopulatedWithExpensesWhenShowExpensesButtonClicked() {
 
 		Category category = new Category("1", "bills", "utilities");
-		category.setExpenses(asList(new Expense(5000d, "name", LocalDate.now(), category)));
 
-		GuiActionRunner.execute(() -> categorySwingView.getListCategoryModel().addElement(category));
-		
-		 Object[][] expectedContents = {
-		            { "name", "5000.0", LocalDate.now().toString() }
-		        };
+		GuiActionRunner.execute(() -> {
+			categorySwingView.getListCategoryModel().addElement(category);
+			categorySwingView.getListExpenseModel().addElement(new Expense(5000d, "name", LocalDate.now(), category));
+
+		});
+
+		Object[][] expectedContents = { { "name", "5000.0", LocalDate.now().toString() } };
 		window.list("categoryList").selectItem(0);
 		window.button(JButtonMatcher.withText("Show Expenses")).click();
+
 		assertThat(window.table("expenseTable").contents()).isEqualTo(expectedContents);
 	}
-	
+
 	@Test
 	public void testExpenseTableAndCrossShouldBeHiddenWhenCrossLabelClicked() {
 
@@ -294,7 +300,7 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 		window.list("categoryList").selectItem(0);
 		window.list("categoryList").selectItem(0);
 		window.button(JButtonMatcher.withText("Show Expenses")).click();
-		
+
 		JLabelFixture label = window.label(JLabelMatcher.withText("X"));
 		label.click();
 
@@ -323,7 +329,7 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 
 		Category category = new Category("1", "bills", "utilities");
 
-		GuiActionRunner.execute(() -> categorySwingView.showError("error message", category));
+		categorySwingView.showError("error message", category);
 		window.label("errorMessageLabel").requireText("error message: " + category);
 	}
 
@@ -332,7 +338,7 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 
 		Category category = new Category("1", "bills", "utilities");
 
-		GuiActionRunner.execute(() -> categorySwingView.categoryAdded(category));
+		categorySwingView.categoryAdded(category);
 		String[] listContents = window.list().contents();
 		assertThat(listContents).containsExactly(category.toString());
 		window.label("errorMessageLabel").requireText(" ");
@@ -350,7 +356,7 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 		});
 
 		// execute
-		GuiActionRunner.execute(() -> categorySwingView.categoryDeleted(new Category("1", "bills", "utilities")));
+		categorySwingView.categoryDeleted(new Category("1", "bills", "utilities"));
 
 		String[] listContents = window.list().contents();
 		assertThat(listContents).containsExactly(category2.toString());
@@ -362,18 +368,62 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 
 		Category category = new Category("1", "bills", "utilities");
 
-		GuiActionRunner.execute(() -> {
-
-			categorySwingView.categoryAdded(category);
-		});
+		categorySwingView.categoryAdded(category);
 
 		Category updatedCategory = new Category("1", "testCategory2", "test");
 		// execute
-		GuiActionRunner.execute(() -> categorySwingView.categoryUpdated(updatedCategory));
+		categorySwingView.categoryUpdated(updatedCategory);
 
 		String[] listContents = window.list().contents();
 		assertThat(listContents).containsExactly(updatedCategory.toString());
 		window.label("errorMessageLabel").requireText(" ");
+	}
+
+	@Test
+	public void testCategoryUpdateShouldNotUpdateWhenCategoryNotFound() {
+
+		Category category = new Category("1", "bills", "utilities");
+		// This category has a different ID and should not be found in the list
+		Category updatedCategory = new Category("2", "testCategory2", "test");
+
+		categorySwingView.categoryAdded(category);
+		categorySwingView.categoryUpdated(updatedCategory);
+
+		// Verify that the original category remains unchanged in the list
+		String[] listContents = window.list().contents();
+		assertThat(listContents).containsExactly(category.toString());
+
+	}
+
+	@Test
+	@GUITest
+	public void testgetAllExpensesShouldAddExpensesToTable() {
+		Category category = new Category("1", "bills", "utilities");
+		Expense expense1 = new Expense(5000d, "Expense1", LocalDate.now(), category);
+		Expense expense2 = new Expense(2500d, "Expense2", LocalDate.now(), category);
+
+		List<Expense> expenses = asList(expense1, expense2);
+		JScrollPane expenseTable = window.robot().finder().findByName("scrollPaneExpenseTable", JScrollPane.class,
+				false);
+		// Add category to the list model
+		GuiActionRunner.execute(() -> {
+			expenseTable.setVisible(true);
+			categorySwingView.getListCategoryModel().addElement(category);
+			categorySwingView.getAllExpenses(expenses);
+		});
+
+		// Expected contents in the table
+		Object[][] expectedContents = { { "Expense1", "5000.0", LocalDate.now().toString() },
+				{ "Expense2", "2500.0", LocalDate.now().toString() } };
+
+		assertThat(expenseTable.isVisible()).isTrue();
+		// Assert the contents of the table
+		assertThat(window.table("expenseTable").contents()).isEqualTo(expectedContents);
+
+		// Attempt to get value at an invalid column index (e.g., column index 3) to
+		// cover the null part of switch case
+		// Ensure the invalid column index returns null
+		assertThat(window.table("expenseTable").target().getModel().getValueAt(0, 3)).isNull();
 	}
 
 	// interaction with Controller
@@ -382,7 +432,8 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 
 		setFieldValues("bills", "other");
 		window.button(JButtonMatcher.withText("Add Category")).click();
-		verify(categoryController).newCategory(new Category("bills", "other"));
+		await().atMost(5, TimeUnit.SECONDS)
+				.untilAsserted(() -> verify(categoryController).newCategory(new Category("bills", "other")));
 	}
 
 	@Test
@@ -397,7 +448,7 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 		});
 		window.list("categoryList").selectItem(1);
 		window.button(JButtonMatcher.withText("Delete Selected")).click();
-		verify(categoryController).deleteCategory(category2);
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> verify(categoryController).deleteCategory(category2));
 
 	}
 
@@ -417,7 +468,24 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Update Category")).click();
 
 		Category updatedCategory = new Category("1", "new Name", "utilities");
-		verify(categoryController).updateCategory(updatedCategory);
+		await().atMost(5, TimeUnit.SECONDS)
+				.untilAsserted(() -> verify(categoryController).updateCategory(updatedCategory));
+
+	}
+
+	@Test
+	public void testShowExpenseButtonShouldDelegateToCategoryControllergetAllExpenses() {
+
+		Category category = new Category("1", "bills", "utilities");
+		GuiActionRunner.execute(() -> {
+			DefaultListModel<Category> listStudentsModel = categorySwingView.getListCategoryModel();
+			listStudentsModel.addElement(category);
+		});
+
+		window.list("categoryList").selectItem(0);
+		window.button(JButtonMatcher.withText("Show Expenses")).click();
+
+		verify(categoryController).getAllExpenses(category);
 
 	}
 

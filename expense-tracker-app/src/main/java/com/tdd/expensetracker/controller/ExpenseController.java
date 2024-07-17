@@ -50,6 +50,7 @@ public class ExpenseController {
 		}
 
 		expenseRepository.save(expense);
+		existingCategory.getExpenses().add(expense);
 		expenseView.expenseAdded(expense);
  
 	}
@@ -71,7 +72,7 @@ public class ExpenseController {
 
 		boolean isValid = validateExpense(updatedExpense);
 
-		if (!isValid) {
+		if (!isValid) { 
 			return;
 		}
 
@@ -93,7 +94,13 @@ public class ExpenseController {
 		expenseRepository.update(updatedExpense);
 		expenseView.expenseUpdated(updatedExpense);
 	}
+	
+	public void allCategory() {
 
+		expenseView.showAllCategory(categoryRepository.findAll());
+	}
+	
+	
 	private boolean validateExpense(Expense expense) {
 		try {
 			ValidateUtils.validateAmount(expense.getAmount());

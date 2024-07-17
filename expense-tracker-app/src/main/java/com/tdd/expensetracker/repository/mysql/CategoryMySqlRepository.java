@@ -85,4 +85,16 @@ public class CategoryMySqlRepository implements CategoryRepository {
 
 	}
 
+	 @Override
+	    public Category findByName(String name) {
+	        Session session = sessionFactory.openSession();
+	        session.beginTransaction();
+	        Category category = session.createQuery("from Category where name = :name", Category.class)
+	                                   .setParameter("name", name)
+	                                   .uniqueResult();
+	        session.getTransaction().commit();
+	        session.close();
+	        return category;
+	    }
+
 }

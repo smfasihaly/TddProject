@@ -34,7 +34,7 @@ public class CategoryMysqlRepositoryTestContainerIT {
 	@BeforeClass
 	public static void setupContainer() {
 		mysqlContainer.start();
-		registry = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml")
+		registry = new StandardServiceRegistryBuilder().configure("hibernate-IT.cfg.xml")
 				.applySetting("hibernate.connection.url", mysqlContainer.getJdbcUrl())
 				.applySetting("hibernate.connection.username", mysqlContainer.getUsername())
 				.applySetting("hibernate.connection.password", mysqlContainer.getPassword()).build();
