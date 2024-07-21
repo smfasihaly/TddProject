@@ -28,33 +28,30 @@ jobs:
       run: xvfb-run mvn verify
       working-directory: expense-tracker-app
 
-    - name: Archive Surefire Test Report
+    - name: Archive Surefire Test Report and Site
       uses: actions/upload-artifact@v2
       if: ${{ always() }}
       with:
-        name: surefire-test-report
-        path: expense-tracker-app/target/surefire-reports
+        name: surefire-report
+        path: |
+          expense-tracker-app/target/surefire-reports
+          expense-tracker-app/target/site/surefire
 
-    - name: Archive JaCoCo Report
+    - name: Archive JaCoCo Report and Site
       uses: actions/upload-artifact@v2
       if: ${{ always() }}
       with:
         name: jacoco-report
         path: expense-tracker-app/target/site/jacoco
 
-    - name: Archive PIT Report
+    - name: Archive PIT Report and Site
       uses: actions/upload-artifact@v2
       if: ${{ always() }}
       with:
         name: pit-report
-        path: expense-tracker-app/target/pit-reports
-
-    - name: Archive Maven Site
-      uses: actions/upload-artifact@v2
-      if: ${{ always() }}
-      with:
-        name: maven-site
-        path: expense-tracker-app/target/site
+        path: |
+          expense-tracker-app/target/pit-reports
+          expense-tracker-app/target/site/pitest
 
   integration-tests:
     runs-on: ubuntu-latest
@@ -62,25 +59,31 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
     - name: Set up JDK 1.8
       uses: actions/setup-java@v1
       with:
         java-version: 1.8        
+
     - name: Cache Maven packages
       uses: actions/cache@v2
       with:
         path: ~/.m2
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml', '**/*.yml') }}
         restore-keys: ${{ runner.os }}-m2-
+
     - name: Run Integration Tests
       run: xvfb-run mvn verify -Pintegration-test
       working-directory: expense-tracker-app
-    - name: Archive Integration Test Report
+
+    - name: Archive Failsafe Test Report and Site
       uses: actions/upload-artifact@v2
       if: ${{ always() }}
       with:
-        name: integration-test-report
-        path: expense-tracker-app/target/failsafe-reports
+        name: failsafe-report
+        path: |
+          expense-tracker-app/target/failsafe-reports
+          expense-tracker-app/target/site/failsafe
 
     - name: Archive Maven Site
       uses: actions/upload-artifact@v2
