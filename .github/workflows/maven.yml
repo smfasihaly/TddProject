@@ -81,6 +81,7 @@ jobs:
       with:
         name: integration-test-report
         path: expense-tracker-app/target/failsafe-reports
+    
     - name: Archive Maven Site
       uses: actions/upload-artifact@v2
       if: ${{ always() }}
