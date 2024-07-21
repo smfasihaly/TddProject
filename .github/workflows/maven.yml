@@ -25,7 +25,7 @@ jobs:
         restore-keys: ${{ runner.os }}-m2-
     
     - name: Run Unit Tests with Jacoco and PIT
-      run: mvn verify site -Punit-test
+      run:  xvfb-run mvn verify site -Punit-test
       working-directory: expense-tracker-app
     
     - name: Archive Surefire Test Report
