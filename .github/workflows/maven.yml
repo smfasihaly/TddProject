@@ -32,24 +32,30 @@ jobs:
       uses: actions/upload-artifact@v2
       if: ${{ always() }}
       with:
-        name: surefire-html-report
-        path: expense-tracker-app/target/site/surefire-report.html
+        name: surefire-test-report
+        path: **/target/surefire-reports
     
     - name: Archive JaCoCo Report
       uses: actions/upload-artifact@v2
       if: ${{ always() }}
       with:
-        name: jacoco-html-report
-        path: expense-tracker-app/target/site/jacoco
+        name: jacoco-report
+        path: **/target/site/jacoco
     
     - name: Archive PIT Report
       uses: actions/upload-artifact@v2
       if: ${{ always() }}
       with:
-        name: pit-html-report
-        path: expense-tracker-app/target/pit-reports
+        name: pit-report
+        path: **/target/pit-reports
     
-   
+    - name: Archive Maven Site
+      uses: actions/upload-artifact@v2
+      if: ${{ always() }}
+      with:
+        name: maven-site
+        path: */target/site
+
   integration-tests:
     runs-on: ubuntu-latest
     needs: unit-tests
@@ -73,6 +79,12 @@ jobs:
       uses: actions/upload-artifact@v2
       if: ${{ always() }}
       with:
-        name: integration-html-report
-        path: expense-tracker-app/target/site/failsafe-reports
-        
+        name: integration-test-report
+        path: expense-tracker-app/target/failsafe-reports
+    - name: Archive Maven Site
+      uses: actions/upload-artifact@v2
+      if: ${{ always() }}
+      with:
+        name: maven-site
+        path: */target/site
+
