@@ -94,7 +94,7 @@ public class CategorySwingViewIT extends AssertJSwingJUnitTestCase {
 
 		GuiActionRunner.execute(() -> categoryController.allCategory());
 
-		assertThat(window.list().contents()).containsExactlyInAnyOrder(category.toString(), category2.toString());
+		assertThat(window.list().contents()).containsExactlyInAnyOrder(getDisplayString(category),getDisplayString(category2));
 	}
 
 	@Test
@@ -108,7 +108,7 @@ public class CategorySwingViewIT extends AssertJSwingJUnitTestCase {
 		
 		Category createdCategory = categoryRepository.findAll().get(0);
 		assertThat(window.list().contents())
-				.containsExactlyInAnyOrder(new Category(createdCategory.getId(), "bills", "other").toString());
+				.containsExactlyInAnyOrder(getDisplayString(new Category(createdCategory.getId(), "bills", "other")));
 
 	}
 
@@ -155,7 +155,7 @@ public class CategorySwingViewIT extends AssertJSwingJUnitTestCase {
 		await().atMost(5, TimeUnit.SECONDS)
 		.untilAsserted(() -> assertThat(window.label("errorMessageLabel").text().trim()).isNotEmpty());
 
-		assertThat(window.list().contents()).containsExactly(category.toString());
+		assertThat(window.list().contents()).containsExactly(getDisplayString(category));
 		window.label("errorMessageLabel").requireText("Category does not exist with id 1: " + category);
 	}
 
@@ -174,7 +174,7 @@ public class CategorySwingViewIT extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Update Category")).click();
 
 		await().atMost(5, TimeUnit.SECONDS)
-		.untilAsserted(() -> assertThat(window.list().contents()).containsExactly(updatedcategory.toString()));
+		.untilAsserted(() -> assertThat(window.list().contents()).containsExactly(getDisplayString(updatedcategory)));
 
 	}
 
@@ -205,7 +205,7 @@ public class CategorySwingViewIT extends AssertJSwingJUnitTestCase {
 
 
 
-		assertThat(window.list().contents()).containsExactly(category.toString(), category1.toString());
+		assertThat(window.list().contents()).containsExactly(getDisplayString(category),getDisplayString(category1));
 
 		window.label("errorMessageLabel").requireText("Already existing category with name bills: " + category);
 	}
@@ -230,7 +230,7 @@ public class CategorySwingViewIT extends AssertJSwingJUnitTestCase {
 		session.close(); 
 
 
-		Object[][] expectedContents = { { "expense", "550.0", LocalDate.now().toString() } };
+		Object[][] expectedContents = { { "550.0", "expense", LocalDate.now().toString() } };
 		window.list("categoryList").selectItem(0);
 		window.button(JButtonMatcher.withText("Show Expenses")).click();
 		assertThat(window.table("expenseTable").contents()).isEqualTo(expectedContents);
@@ -239,6 +239,11 @@ public class CategorySwingViewIT extends AssertJSwingJUnitTestCase {
 	private void setFieldValues(String name, String description) {
 		window.textBox("nameTextBox").enterText(name);
 		window.textBox("descriptionTextBox").enterText(description);
+
+	}
+	
+	private String getDisplayString(Category category) {
+		return category.getId()  + " | " + category.getName()  + " | " + category.getDescription();
 
 	}
 

@@ -25,7 +25,7 @@ public class CategoryController {
 		categoryView.showAllCategory(categoryRepository.findAll());
 	}
 
-	public void newCategory(Category category) {
+	public synchronized void newCategory(Category category) {
 
 		if (!validateCategory(category)) {
 			return;
@@ -49,7 +49,7 @@ public class CategoryController {
 		categoryView.categoryAdded(category);
 	}
 
-	public void deleteCategory(Category categoryToDelete) {
+	public synchronized void deleteCategory(Category categoryToDelete) {
 
 		Category existingCategory = categoryRepository.findById(categoryToDelete.getId());
 
@@ -69,7 +69,7 @@ public class CategoryController {
 
 	}
 
-	public void updateCategory(Category categoryToUpdate) {
+	public synchronized void updateCategory(Category categoryToUpdate) {
 
 		if (!validateCategory(categoryToUpdate)) {
 			return;
@@ -100,7 +100,7 @@ public class CategoryController {
 			categoryView.showError("No Expense created for this category", category);
 			return;
 		}
-
+		
 		categoryView.getAllExpenses(expenses);
 	}
 	/**

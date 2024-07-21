@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.DefaultListModel;
+import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
@@ -19,7 +20,6 @@ import org.assertj.swing.core.matcher.JLabelMatcher;
 import org.assertj.swing.edt.GuiActionRunner;
 import org.assertj.swing.fixture.FrameFixture;
 import org.assertj.swing.fixture.JButtonFixture;
-import org.assertj.swing.fixture.JLabelFixture;
 import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -75,6 +75,7 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Add Category")).requireDisabled();
 		window.list("categoryList");
 		window.label(JLabelMatcher.withText("X")).requireNotVisible();
+		window.label(JLabelMatcher.withText("Total: 0.0")).requireNotVisible();
 		window.button(JButtonMatcher.withText("Delete Selected")).requireDisabled();
 		window.button(JButtonMatcher.withText("Update Selected")).requireDisabled();
 		window.button(JButtonMatcher.withText("Show Expenses")).requireDisabled();
@@ -258,56 +259,23 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 	}
 
 	@Test
-	public void testExpenseTableAndCrossShouldBeVisibleWhenShowExpensesButtonClicked() {
-
-		GuiActionRunner.execute(
-				() -> categorySwingView.getListCategoryModel().addElement(new Category("1", "bills", "utilities")));
-
-		window.list("categoryList").selectItem(0);
-		window.button(JButtonMatcher.withText("Show Expenses")).click();
-
-		JScrollPane expenseTable = window.robot().finder().findByName("scrollPaneExpenseTable", JScrollPane.class,
-				false);
-		assertThat(expenseTable.isVisible()).isTrue();
-
-		window.label(JLabelMatcher.withText("X")).requireVisible();
-	}
-
-	@Test
-	public void testExpenseTableShouldBePopulatedWithExpensesWhenShowExpensesButtonClicked() {
-
-		Category category = new Category("1", "bills", "utilities");
-
-		GuiActionRunner.execute(() -> {
-			categorySwingView.getListCategoryModel().addElement(category);
-			categorySwingView.getListExpenseModel().addElement(new Expense(5000d, "name", LocalDate.now(), category));
-
-		});
-
-		Object[][] expectedContents = { { "name", "5000.0", LocalDate.now().toString() } };
-		window.list("categoryList").selectItem(0);
-		window.button(JButtonMatcher.withText("Show Expenses")).click();
-
-		assertThat(window.table("expenseTable").contents()).isEqualTo(expectedContents);
-	}
-
-	@Test
 	public void testExpenseTableAndCrossShouldBeHiddenWhenCrossLabelClicked() {
-
-		GuiActionRunner.execute(
-				() -> categorySwingView.getListCategoryModel().addElement(new Category("1", "bills", "utilities")));
-
-		window.list("categoryList").selectItem(0);
-		window.list("categoryList").selectItem(0);
-		window.button(JButtonMatcher.withText("Show Expenses")).click();
-
-		JLabelFixture label = window.label(JLabelMatcher.withText("X"));
-		label.click();
-
+		// setting table and labels visible manually
+		JLabel crossLabel = window.robot().finder().findByName("crossLabel", JLabel.class, false);
 		JScrollPane expenseTable = window.robot().finder().findByName("scrollPaneExpenseTable", JScrollPane.class,
 				false);
+		JLabel totalLabel = window.robot().finder().findByName("totalLabel", JLabel.class, false);
+		GuiActionRunner.execute(() -> {
+			crossLabel.setVisible(true);
+			expenseTable.setVisible(true);
+			totalLabel.setVisible(true);
+		});
+		
+		window.label("crossLabel").click();
+
 		assertThat(expenseTable.isVisible()).isFalse();
-		label.requireNotVisible();
+		assertThat(crossLabel.isVisible()).isFalse();
+		assertThat(totalLabel.isVisible()).isFalse();
 	}
 
 	// View Interface
@@ -319,8 +287,7 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 
 		GuiActionRunner.execute(() -> categorySwingView.showAllCategory(asList(category, category2)));
 
-		String[] listContents = window.list().contents();
-		assertThat(listContents).containsExactly(category.toString(), category2.toString());
+		assertThat(window.list().contents()).containsExactly(getDisplayString(category), getDisplayString(category2));
 
 	}
 
@@ -339,8 +306,7 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 		Category category = new Category("1", "bills", "utilities");
 
 		categorySwingView.categoryAdded(category);
-		String[] listContents = window.list().contents();
-		assertThat(listContents).containsExactly(category.toString());
+		assertThat(window.list().contents()).containsExactly(getDisplayString(category));
 		window.label("errorMessageLabel").requireText(" ");
 	}
 
@@ -358,8 +324,7 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 		// execute
 		categorySwingView.categoryDeleted(new Category("1", "bills", "utilities"));
 
-		String[] listContents = window.list().contents();
-		assertThat(listContents).containsExactly(category2.toString());
+		assertThat(window.list().contents()).containsExactly(getDisplayString(category2));
 		window.label("errorMessageLabel").requireText(" ");
 	}
 
@@ -374,8 +339,7 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 		// execute
 		categorySwingView.categoryUpdated(updatedCategory);
 
-		String[] listContents = window.list().contents();
-		assertThat(listContents).containsExactly(updatedCategory.toString());
+		assertThat(window.list().contents()).containsExactly(getDisplayString(updatedCategory));
 		window.label("errorMessageLabel").requireText(" ");
 	}
 
@@ -390,40 +354,41 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 		categorySwingView.categoryUpdated(updatedCategory);
 
 		// Verify that the original category remains unchanged in the list
-		String[] listContents = window.list().contents();
-		assertThat(listContents).containsExactly(category.toString());
+		assertThat(window.list().contents()).containsExactly(getDisplayString(category));
 
 	}
 
 	@Test
 	@GUITest
-	public void testgetAllExpensesShouldAddExpensesToTable() {
+	public void testGetAllExpensesShouldShowTableTotalAndCrossAddExpensesToTable() {
 		Category category = new Category("1", "bills", "utilities");
 		Expense expense1 = new Expense(5000d, "Expense1", LocalDate.now(), category);
 		Expense expense2 = new Expense(2500d, "Expense2", LocalDate.now(), category);
 
 		List<Expense> expenses = asList(expense1, expense2);
-		JScrollPane expenseTable = window.robot().finder().findByName("scrollPaneExpenseTable", JScrollPane.class,
-				false);
+
 		// Add category to the list model
 		GuiActionRunner.execute(() -> {
-			expenseTable.setVisible(true);
 			categorySwingView.getListCategoryModel().addElement(category);
 			categorySwingView.getAllExpenses(expenses);
 		});
 
 		// Expected contents in the table
-		Object[][] expectedContents = { { "Expense1", "5000.0", LocalDate.now().toString() },
-				{ "Expense2", "2500.0", LocalDate.now().toString() } };
+		Object[][] expectedContents = { { "5000.0", "Expense1", LocalDate.now().toString() },
+				{ "2500.0", "Expense2", LocalDate.now().toString() } };
 
-		assertThat(expenseTable.isVisible()).isTrue();
 		// Assert the contents of the table
-		assertThat(window.table("expenseTable").contents()).isEqualTo(expectedContents);
+		window.table("expenseTable").requireVisible();
+		window.label(JLabelMatcher.withText("X")).requireVisible();
+		window.label("totalLabel").requireVisible();
 
+		assertThat(window.table("expenseTable").contents()).isEqualTo(expectedContents);
+		window.label("totalLabel").requireText("Total: 7500.0");
 		// Attempt to get value at an invalid column index (e.g., column index 3) to
 		// cover the null part of switch case
 		// Ensure the invalid column index returns null
 		assertThat(window.table("expenseTable").target().getModel().getValueAt(0, 3)).isNull();
+
 	}
 
 	// interaction with Controller
@@ -492,6 +457,11 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 	private void setFieldValues(String name, String description) {
 		window.textBox("nameTextBox").enterText(name);
 		window.textBox("descriptionTextBox").enterText(description);
+
+	}
+
+	private String getDisplayString(Category category) {
+		return category.getId() + " | " + category.getName() + " | " + category.getDescription();
 
 	}
 

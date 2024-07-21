@@ -26,7 +26,7 @@ public class ExpenseController {
 		expenseView.showAllExpense(expenseRepository.findAll());
 	}
 
-	public void newExpense(Expense expense) {
+	public synchronized void newExpense(Expense expense) {
 
 		boolean isValid = validateExpense(expense);
 
@@ -54,8 +54,7 @@ public class ExpenseController {
 		expenseView.expenseAdded(expense);
  
 	}
-
-	public void deleteExpense(Expense expenseToDelete) {
+	public synchronized  void deleteExpense(Expense expenseToDelete) {
 
 		Expense existingExpense = expenseRepository.findById(expenseToDelete.getId());
 
@@ -63,12 +62,11 @@ public class ExpenseController {
 			this.expenseView.showError("Expense does not exist with id " + expenseToDelete.getId(), expenseToDelete);
 			return;
 		}
- 
 		expenseRepository.delete(expenseToDelete);
 		expenseView.expenseDeleted(expenseToDelete);
 	}
 
-	public void updateExpense(Expense updatedExpense) {
+	public synchronized void updateExpense(Expense updatedExpense) {
 
 		boolean isValid = validateExpense(updatedExpense);
 

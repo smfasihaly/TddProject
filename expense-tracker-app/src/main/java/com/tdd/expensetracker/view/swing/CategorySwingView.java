@@ -1,6 +1,7 @@
 package com.tdd.expensetracker.view.swing;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -10,9 +11,11 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -61,14 +64,15 @@ public class CategorySwingView extends JFrame implements CategoryView {
 	private CategoryController categoryController;
 	private JTable expenseTable;
 	private JLabel lblHideTable;
+	private JLabel lblTotal;
 
 	DefaultListModel<Category> getListCategoryModel() {
 		return listCategoryModel;
 	}
 
-	DefaultListModel<Expense> getListExpenseModel() {
-		return listExpenseModel;
-	}
+//	DefaultListModel<Expense> getListExpenseModel() {
+//		return listExpenseModel;
+//	}
 
 	public void setCategoryController(CategoryController categoryController) {
 		this.categoryController = categoryController;
@@ -97,12 +101,11 @@ public class CategorySwingView extends JFrame implements CategoryView {
 
 		listCategoryModel = new DefaultListModel<Category>();
 		listExpenseModel = new DefaultListModel<Expense>();
-//		Category categorysample = new Category("1", "name", "description");
-//		categorysample.setExpenses(asList(new Expense(5000d, "name", LocalDate.now(), null)));
+//		Category categorysample = new Category("1", "namererere", "description");
+//		categorysample.setExpenses(asList(new Expense(5000d, "nasdsddsdsme", LocalDate.now(), null)));
 //		Category categorysample2 = new Category("2", "nam2e", "de2s2c2ription");
-//		categorysample2.setExpenses(asList(new Expense(5000d, "name", LocalDate.now(), null),
-//				new Expense(500d, "name1", LocalDate.now(), null),new Expense(50d, "name", LocalDate.now(), null)));
-//		
+//		categorysample2.setExpenses(asList(new Expense(5000d, "name22", LocalDate.now(), null),
+//				new Expense(500d, "name1", LocalDate.now(), null), new Expense(50d, "name33", LocalDate.now(), null)));
 //
 //		listCategoryModel.addElement(categorysample);
 //		listCategoryModel.addElement(categorysample2);
@@ -130,9 +133,10 @@ public class CategorySwingView extends JFrame implements CategoryView {
 		setContentPane(contentPane);
 		GridBagLayout gbl_contentPane = new GridBagLayout();
 		gbl_contentPane.columnWidths = new int[] { 0, 0, 0, 0, 0, 0 };
-		gbl_contentPane.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+		gbl_contentPane.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 		gbl_contentPane.columnWeights = new double[] { 1.0, 1.0, 1.0, 0.0, 0.0, Double.MIN_VALUE };
-		gbl_contentPane.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
+		gbl_contentPane.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0,
+				Double.MIN_VALUE };
 		contentPane.setLayout(gbl_contentPane);
 
 		txtID = new JTextField();
@@ -190,7 +194,7 @@ public class CategorySwingView extends JFrame implements CategoryView {
 		btnAddCategory = new JButton("Add Category");
 		btnAddCategory.addActionListener(e -> {
 			new Thread(() -> {
-				
+
 				Category category = new Category(txtName.getText(), txtDescription.getText());
 				categoryController.newCategory(category);
 				resetFormState();
@@ -219,7 +223,7 @@ public class CategorySwingView extends JFrame implements CategoryView {
 		btnUpdateCategory = new JButton("Update Category");
 		btnUpdateCategory.addActionListener(e -> {
 			new Thread(() -> {
-				
+
 				Category category = new Category(txtID.getText(), txtName.getText(), txtDescription.getText());
 				categoryController.updateCategory(category);
 				resetFormState();
@@ -253,6 +257,17 @@ public class CategorySwingView extends JFrame implements CategoryView {
 		});
 		categoryList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		categoryList.setName("categoryList");
+		categoryList.setCellRenderer(new DefaultListCellRenderer() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+					boolean cellHasFocus) {
+				Category category = (Category) value;
+				return super.getListCellRendererComponent(list, getDisplayString(category), index, isSelected,
+						cellHasFocus);
+			}
+		});
 		GridBagConstraints gbc_categoryList = new GridBagConstraints();
 		gbc_categoryList.insets = new Insets(0, 0, 5, 0);
 		gbc_categoryList.gridwidth = 4;
@@ -265,19 +280,18 @@ public class CategorySwingView extends JFrame implements CategoryView {
 		btnShowExpenses.addActionListener(e -> {
 			Category selectedCategory = categoryList.getSelectedValue();
 			categoryController.getAllExpenses(selectedCategory);
-
-			scrollPane1.setVisible(true);
-			lblHideTable.setVisible(true);
-
+			
 		});
 
 		lblHideTable = new JLabel("X");
+		lblHideTable.setName("crossLabel");
 		lblHideTable.addMouseListener(new MouseAdapter() {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				scrollPane1.setVisible(false);
 				lblHideTable.setVisible(false);
+				lblTotal.setVisible(false);
 
 			}
 		});
@@ -320,7 +334,7 @@ public class CategorySwingView extends JFrame implements CategoryView {
 		btnDeleteSelected = new JButton("Delete Selected");
 		btnDeleteSelected.addActionListener(e -> {
 			new Thread(() -> {
-				
+
 				categoryController.deleteCategory(categoryList.getSelectedValue());
 			}).start();
 		});
@@ -340,7 +354,7 @@ public class CategorySwingView extends JFrame implements CategoryView {
 		lblError.setForeground(new Color(237, 51, 59));
 		lblError.setName("errorMessageLabel");
 		GridBagConstraints gbc_lblError = new GridBagConstraints();
-		gbc_lblError.insets = new Insets(0, 0, 0, 5);
+		gbc_lblError.insets = new Insets(0, 0, 5, 5);
 		gbc_lblError.gridx = 0;
 		gbc_lblError.gridy = 8;
 		lblError.setForeground(new Color(237, 51, 59));
@@ -368,6 +382,7 @@ public class CategorySwingView extends JFrame implements CategoryView {
 
 		// Define GridBagConstraints for the scroll pane
 		GridBagConstraints gbc_scrollPane1 = new GridBagConstraints();
+		gbc_scrollPane1.insets = new Insets(0, 0, 5, 0);
 		gbc_scrollPane1.gridwidth = 5;
 		gbc_scrollPane1.fill = GridBagConstraints.BOTH;
 		gbc_scrollPane1.gridx = 0;
@@ -375,13 +390,39 @@ public class CategorySwingView extends JFrame implements CategoryView {
 		scrollPane1.setViewportView(expenseTable);
 		getContentPane().add(scrollPane1, gbc_scrollPane1);
 
+		lblTotal = new JLabel("Total: 0.0");
+		lblTotal.setName("totalLabel");
+		lblTotal.setVisible(false);
+		GridBagConstraints gbc_lblTotal = new GridBagConstraints();
+		gbc_lblTotal.anchor = GridBagConstraints.WEST;
+		gbc_lblTotal.gridwidth = 3;
+		gbc_lblTotal.insets = new Insets(0, 0, 0, 5);
+		gbc_lblTotal.gridx = 0;
+		gbc_lblTotal.gridy = 9;
+		contentPane.add(lblTotal, gbc_lblTotal);
+
 	}
 
+	private String getDisplayString(Category category) {
+		return category.getId() + " | " + category.getName() + " | " + category.getDescription();
+
+	}
+	
+	private void setTotalAmountLabel() {
+		double sum = 0.0;
+		Enumeration<Expense> elements = listExpenseModel.elements();
+		while (elements.hasMoreElements()) {
+			Expense expense = elements.nextElement();
+			sum += expense.getAmount();
+		}
+		lblTotal.setText("Total: "+Double.toString(sum));
+	}
+	
 	private void createTableModel() {
 		AbstractTableModel tableModel = new AbstractTableModel() {
 			private static final long serialVersionUID = 1L;
 			private final String[] columnNames = { "Description", "Amount", "Date" };
-
+			
 			@Override
 			public int getRowCount() {
 				return listExpenseModel.getSize();
@@ -402,9 +443,9 @@ public class CategorySwingView extends JFrame implements CategoryView {
 				Expense expense = listExpenseModel.getElementAt(rowIndex);
 				switch (columnIndex) {
 				case 0:
-					return expense.getDescription();
-				case 1:
 					return expense.getAmount();
+				case 1:
+					return expense.getDescription();
 				case 2:
 					return expense.getDate();
 				default:
@@ -417,7 +458,7 @@ public class CategorySwingView extends JFrame implements CategoryView {
 		expenseTable.setModel(tableModel);
 	}
 
-	protected void resetFormState() {
+	private void resetFormState() {
 		SwingUtilities.invokeLater(() -> {
 			txtID.setText("");
 			txtDescription.setText("");
@@ -439,9 +480,16 @@ public class CategorySwingView extends JFrame implements CategoryView {
 
 	@Override
 	public void getAllExpenses(List<Expense> categoryExpenses) {
-
+		listExpenseModel.clear();
 		categoryExpenses.stream().forEach(listExpenseModel::addElement);
 		resetErrorLabel();
+		setTotalAmountLabel();
+		scrollPane1.setVisible(true);
+		lblTotal.setVisible(true);
+		lblHideTable.setVisible(true);
+		expenseTable.repaint();
+		expenseTable.revalidate();
+
 	}
 
 	@Override
@@ -485,5 +533,6 @@ public class CategorySwingView extends JFrame implements CategoryView {
 			resetErrorLabel();
 		});
 	}
+	
 
 }

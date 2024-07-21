@@ -1,8 +1,10 @@
 package com.tdd.expensetracker.view.swing;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -12,10 +14,12 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.stream.IntStream;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -26,6 +30,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 import com.tdd.expensetracker.controller.ExpenseController;
@@ -34,9 +40,6 @@ import com.tdd.expensetracker.model.Expense;
 import com.tdd.expensetracker.view.ExpenseView;
 import com.toedter.calendar.JDateChooser;
 import com.toedter.calendar.JTextFieldDateEditor;
-import java.awt.Font;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 
 public class ExpenseSwingView extends JFrame implements ExpenseView {
 
@@ -86,6 +89,7 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 	private JButton btnCancel;
 	private DefaultListModel<Expense> listExpenseModel;
 	private JDateChooser dateChooser;
+	private JLabel lblTotal;
 
 	DefaultListModel<Expense> getListExpenseModel() {
 		return listExpenseModel;
@@ -98,7 +102,7 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 
 		comboBoxCategoriesModel = new DefaultComboBoxModel<Category>();
 		listExpenseModel = new DefaultListModel<Expense>();
-//		 getComboCategoriesModel().addElement(new Category("2", "Bills", "Utilities"));
+	//	getComboCategoriesModel().addElement(new Category("2", "Bills", "Utilities"));
 
 		KeyAdapter btnAddEnabler = new KeyAdapter() {
 			@Override
@@ -111,16 +115,16 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 
 		setTitle("Expense");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 600, 300);
+		setBounds(100, 100, 627, 362);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
 		setContentPane(contentPane);
 		GridBagLayout gbl_contentPane = new GridBagLayout();
 		gbl_contentPane.columnWidths = new int[] { 0, 0, 0, 0 };
-		gbl_contentPane.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+		gbl_contentPane.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0 };
 		gbl_contentPane.columnWeights = new double[] { 0.0, 1.0, 1.0, Double.MIN_VALUE };
-		gbl_contentPane.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
+		gbl_contentPane.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0, 0.0, 0.0, 0.0, 1.0,
 				Double.MIN_VALUE };
 		contentPane.setLayout(gbl_contentPane);
 
@@ -225,6 +229,22 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 		cbxCategory.setBackground(new Color(255, 255, 255));
 		cbxCategory.setName("categoryComboBox");
 		cbxCategory.addItemListener(e -> setEnableAddOrUpdateButton());
+		cbxCategory.setRenderer(new DefaultListCellRenderer() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+					boolean cellHasFocus) {
+				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+				if (value instanceof Category) {
+					Category category = (Category) value;
+					setText(category.getName()); // Display the name of the category
+				}
+				return this;
+			}
+
+		});
 		GridBagConstraints gbc_cbxCategory = new GridBagConstraints();
 		gbc_cbxCategory.gridwidth = 3;
 		gbc_cbxCategory.insets = new Insets(0, 0, 5, 0);
@@ -237,7 +257,7 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 		btnAddExpense = new JButton("Add Expense");
 		btnAddExpense.addActionListener(e -> {
 			new Thread(() -> {
-				
+
 				LocalDate date = getSelectedDateAsLocalDate();
 
 				Category selectedCategory = comboBoxCategoriesModel.getElementAt(cbxCategory.getSelectedIndex());
@@ -306,6 +326,17 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 		});
 		expenseList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		expenseList.setName("expenseList");
+		expenseList.setCellRenderer(new DefaultListCellRenderer() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+					boolean cellHasFocus) {
+				Expense expense = (Expense) value;
+				return super.getListCellRendererComponent(list, getDisplayString(expense), index, isSelected,
+						cellHasFocus);
+			}
+		});
 		scrollPane.setViewportView(expenseList);
 
 		btnUpdateSelected = new JButton("Update Selected");
@@ -350,6 +381,17 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 		gbc_btnDelete.gridy = 9;
 		contentPane.add(btnDelete, gbc_btnDelete);
 
+		lblTotal = new JLabel("Total: 0");
+		lblTotal.setName("totalLabel");
+		GridBagConstraints gbc_lblTotal = new GridBagConstraints();
+		gbc_lblTotal.fill = GridBagConstraints.VERTICAL;
+		gbc_lblTotal.anchor = GridBagConstraints.WEST;
+		gbc_lblTotal.gridwidth = 2;
+		gbc_lblTotal.insets = new Insets(0, 0, 5, 5);
+		gbc_lblTotal.gridx = 0;
+		gbc_lblTotal.gridy = 10;
+		contentPane.add(lblTotal, gbc_lblTotal);
+
 		lblError = new JLabel(" ");
 		lblError.setHorizontalAlignment(SwingConstants.LEFT);
 		lblError.setFont(new Font("Dialog", Font.BOLD, 12));
@@ -360,9 +402,24 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 		gbc_lblError.insets = new Insets(0, 0, 5, 0);
 		gbc_lblError.gridwidth = 4;
 		gbc_lblError.gridx = 0;
-		gbc_lblError.gridy = 10;
+		gbc_lblError.gridy = 11;
 		contentPane.add(lblError, gbc_lblError);
 
+	}
+
+	private void setTotalAmountLabel() {
+		double sum = 0.0;
+		Enumeration<Expense> elements = listExpenseModel.elements();
+		while (elements.hasMoreElements()) {
+			Expense expense = elements.nextElement();
+			sum += expense.getAmount();
+		}
+		lblTotal.setText("Total: "+Double.toString(sum));
+	}
+
+	private String getDisplayString(Expense expense) {
+		return expense.getId() + " | " + expense.getDescription() + " | " + expense.getAmount() + " | "
+				+ expense.getDate() + " | " + expense.getCategory().getName();
 	}
 
 	private LocalDate getSelectedDateAsLocalDate() {
@@ -389,7 +446,7 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 		});
 	}
 
-	protected void setEnableAddOrUpdateButton() {
+	private void setEnableAddOrUpdateButton() {
 		if (btnAddExpense.isVisible()) {
 			btnAddExpense.setEnabled(!txtDescription.getText().trim().isEmpty() && !txtAmount.getText().trim().isEmpty()
 					&& dateChooser.getDate() != null && (cbxCategory.getSelectedItem() != null));
@@ -404,19 +461,23 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 	@Override
 	public void showAllExpense(List<Expense> expense) {
 		expense.stream().forEach(listExpenseModel::addElement);
+		setTotalAmountLabel();
 	}
 
 	@Override
 	public void expenseAdded(Expense expense) {
 		SwingUtilities.invokeLater(() -> {
 			listExpenseModel.addElement(expense);
+			setTotalAmountLabel();
 			resetErrorLabel();
 		});
 	}
 
 	@Override
 	public void showError(String message, Expense expense) {
-		SwingUtilities.invokeLater(() -> lblError.setText(message + ": " + expense));
+		SwingUtilities.invokeLater(() -> {
+			lblError.setText(message + ": " + expense);
+		});
 
 	}
 
@@ -424,6 +485,7 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 	public void expenseDeleted(Expense expense) {
 		SwingUtilities.invokeLater(() -> {
 			listExpenseModel.removeElement(expense);
+			setTotalAmountLabel();
 			resetErrorLabel();
 		});
 	}
@@ -434,6 +496,7 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 			int index = IntStream.range(0, listExpenseModel.size())
 					.filter(i -> listExpenseModel.get(i).getId().equals(updatedExpense.getId())).findFirst().orElse(-1);
 			listExpenseModel.set(index, updatedExpense);
+			setTotalAmountLabel();
 			resetErrorLabel();
 		});
 	}
@@ -445,6 +508,7 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 	@Override
 	public void showAllCategory(List<Category> categories) {
 		categories.stream().forEach(comboBoxCategoriesModel::addElement);
+		setTotalAmountLabel();
 
 	}
 

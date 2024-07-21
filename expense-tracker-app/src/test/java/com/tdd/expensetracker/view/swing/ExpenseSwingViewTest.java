@@ -94,7 +94,7 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Update Selected")).requireDisabled();
 		window.button(JButtonMatcher.withText("Update Expense")).requireNotVisible();
 		window.button(JButtonMatcher.withText("Cancel")).requireNotVisible();
-
+		window.label("totalLabel").requireText("Total: 0");
 		window.label("errorMessageLabel").requireText(" ");
 	}
 
@@ -181,6 +181,7 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Add Expense")).requireDisabled();
 		window.button(JButtonMatcher.withText("Update Expense")).requireNotVisible();
 		window.button(JButtonMatcher.withText("Cancel")).requireNotVisible();
+
 
 	}
 
@@ -347,7 +348,7 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 
 	// View Interface
 	@Test
-	public void testsShowAllExpensesShouldAddExpenseDescriptionsToTheList() {
+	public void testsShowAllExpensesShouldAddExpenseDescriptionsToTheListUpdateTotal() {
 
 		Expense expense = new Expense("1", 5000d, "testExpense", LocalDate.now(), existingCategory);
 		Expense expense2 = new Expense("2", 50d, "testExpense2", LocalDate.now(), existingCategory);
@@ -355,8 +356,8 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		GuiActionRunner.execute(() -> expenseSwingView.showAllExpense(asList(expense, expense2)));
 
 		String[] listContents = window.list().contents();
-		assertThat(listContents).containsExactly(expense.toString(), expense2.toString());
-
+		assertThat(listContents).containsExactly(getDisplayString(expense), getDisplayString(expense2));
+		window.label("totalLabel").requireText("Total: 5050.0");
 	}
 
 	@Test
@@ -369,46 +370,51 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 	}
 
 	@Test
-	public void testExpenseAddedShouldAddTheExpenseToTheListAndResetTheErrorLabel() {
+	public void testExpenseAddedShouldAddTheExpenseToTheListAndResetTheErrorLabelAndUpdateTotal() {
 
 		Expense expense = new Expense("1", 5000d, "testExpense", LocalDate.now(), existingCategory);
 
 		expenseSwingView.expenseAdded(expense);
 		String[] listContents = window.list().contents();
-		assertThat(listContents).containsExactly(expense.toString());
+		assertThat(listContents).containsExactly(getDisplayString(expense));
 		window.label("errorMessageLabel").requireText(" ");
+		window.label("totalLabel").requireText("Total: 5000.0");
 	}
 
 	@Test
-	public void testExpenseDeleteShouldRemoveTheExpenseFromTheListAndResetTheErrorLabel() {
+	public void testExpenseDeleteShouldRemoveTheExpenseFromTheListAndResetTheErrorLabelAndUpdateTotal() {
 
 		Expense expense = new Expense("1", 5000d, "testExpense", LocalDate.now(), existingCategory);
 		Expense expense2 = new Expense("2", 50d, "testExpense2", LocalDate.now(), existingCategory);
 
 		expenseSwingView.expenseAdded(expense);
 		expenseSwingView.expenseAdded(expense2);
-
+		window.label("totalLabel").requireText("Total: 5050.0");
 		expenseSwingView.expenseDeleted(new Expense("1", 5000d, "testExpense", LocalDate.now(), existingCategory));
 
 		String[] listContents = window.list().contents();
-		assertThat(listContents).containsExactly(expense2.toString());
+		assertThat(listContents).containsExactly(getDisplayString(expense2));
 		window.label("errorMessageLabel").requireText(" ");
+
+		window.label("totalLabel").requireText("Total: 50.0");
 	}
 
 	@Test
-	public void testExpenseUpdateShouldUpdateTheExpenseFromTheListAndResetTheErrorLabel() {
+	public void testExpenseUpdateShouldUpdateTheExpenseFromTheListAndResetTheErrorLabelUpdateTotal() {
 
 		Expense expense = new Expense("1", 5000d, "testExpense", LocalDate.now(), existingCategory);
 
 		expenseSwingView.expenseAdded(expense);
-
+		window.label("totalLabel").requireText("Total: 5000.0");
+		
 		Expense updatedExpense = new Expense("1", 50d, "testExpense2", LocalDate.now(), existingCategory);
 		// execute
 		expenseSwingView.expenseUpdated(updatedExpense);
 
 		String[] listContents = window.list().contents();
-		assertThat(listContents).containsExactly(updatedExpense.toString());
+		assertThat(listContents).containsExactly(getDisplayString(updatedExpense));
 		window.label("errorMessageLabel").requireText(" ");
+		window.label("totalLabel").requireText("Total: 50.0");
 	}
 
 	@Test
@@ -421,7 +427,7 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		});
 
 		String[] comboBoxContent = window.comboBox().contents();
-		assertThat(comboBoxContent).containsExactly(existingCategory.toString(), category.toString());
+		assertThat(comboBoxContent).containsExactly(existingCategory.getName(), category.getName());
 
 	}
 
@@ -469,7 +475,6 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		Expense updatedExpense = new Expense("1", 50d, "testExpense", LocalDate.now(), existingCategory);
 		await().atMost(5, TimeUnit.SECONDS)
 				.untilAsserted(() -> verify(expenseController).updateExpense(updatedExpense));
-
 	}
 
 	private void setFieldValues(String description, String amount, LocalDate date, Category category) {
@@ -502,5 +507,9 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 
 			jdateChooser.setDate(null);
 		});
+	}
+	private String getDisplayString(Expense expense) {
+		// TODO Auto-generated method stub
+		return expense.getId() + " | " + expense.getDescription() +  " | " + expense.getAmount() + " | " + expense.getDate() + " | " + expense.getCategory().getName()  ;
 	}
 }

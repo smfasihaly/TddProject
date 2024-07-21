@@ -110,7 +110,8 @@ public class ExpenseSwingViewIT extends AssertJSwingJUnitTestCase {
 
 		GuiActionRunner.execute(() -> expenseController.allExpense());
 
-		assertThat(window.list().contents()).containsExactlyInAnyOrder(expense.toString(), expense2.toString());
+		window.label("totalLabel").requireText("Total: 5050.0");
+		assertThat(window.list().contents()).containsExactlyInAnyOrder(getDisplayString(expense), getDisplayString(expense2));
 	}
 
 	@Test
@@ -121,8 +122,9 @@ public class ExpenseSwingViewIT extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Add Expense")).click();
 		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> assertThat(expenseRepository.findAll()).isNotEmpty());
 		Expense createdExpense = expenseRepository.findAll().get(0);
-		assertThat(window.list().contents()).containsExactly(
-				new Expense(createdExpense.getId(), 5000d, "testExpense", LocalDate.now(), category).toString());
+		assertThat(window.list().contents()).containsExactly(getDisplayString(createdExpense));
+
+		window.label("totalLabel").requireText("Total: 5000.0");
 	}
 
 	@Test
@@ -150,6 +152,7 @@ public class ExpenseSwingViewIT extends AssertJSwingJUnitTestCase {
 		window.list().selectItem(0);
 		window.button(JButtonMatcher.withText("Delete Selected")).click();
 		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> assertThat(window.list().contents()).isEmpty());
+		window.label("totalLabel").requireText("Total: 0.0");
 	}
 
 	@Test
@@ -163,7 +166,7 @@ public class ExpenseSwingViewIT extends AssertJSwingJUnitTestCase {
 		await().atMost(5, TimeUnit.SECONDS)
 				.untilAsserted(() -> assertThat(window.label("errorMessageLabel").text().trim()).isNotEmpty());
 
-		assertThat(window.list().contents()).containsExactly(expense.toString());
+		assertThat(window.list().contents()).containsExactly(getDisplayString(expense));
 		window.label("errorMessageLabel").requireText("Expense does not exist with id 1: " + expense);
 
 	}
@@ -181,8 +184,9 @@ public class ExpenseSwingViewIT extends AssertJSwingJUnitTestCase {
 		window.textBox("descriptionTextBox").setText(updatedexpense.getDescription());
 		window.button(JButtonMatcher.withText("Update Expense")).click();
 		await().atMost(5, TimeUnit.SECONDS)
-				.untilAsserted(() -> assertThat(window.list().contents()).containsExactly(updatedexpense.toString()));
+				.untilAsserted(() -> assertThat(window.list().contents()).containsExactly(getDisplayString(updatedexpense)));
 
+		window.label("totalLabel").requireText("Total: 5000.0");
 	}
 
 	@Test
@@ -202,7 +206,7 @@ public class ExpenseSwingViewIT extends AssertJSwingJUnitTestCase {
 		await().atMost(5, TimeUnit.SECONDS)
 				.untilAsserted(() -> assertThat(window.label("errorMessageLabel").text().trim()).isNotEmpty());
 
-		assertThat(window.list().contents()).containsExactly(expense.toString());
+		assertThat(window.list().contents()).containsExactly(getDisplayString(expense));
 
 		window.label("errorMessageLabel").requireText("Expense does not exist with id 1: " + expense);
 
@@ -236,6 +240,10 @@ public class ExpenseSwingViewIT extends AssertJSwingJUnitTestCase {
 				jdateChooser.setDate(localDateToDate);
 			});
 		}
+	}
+	private String getDisplayString(Expense expense) {
+		// TODO Auto-generated method stub
+		return expense.getId() + " | " + expense.getDescription() +  " | " + expense.getAmount() + " | " + expense.getDate() + " | " + expense.getCategory().getName()  ;
 	}
 
 }
