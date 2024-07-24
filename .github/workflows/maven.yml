@@ -26,7 +26,7 @@ jobs:
 
     - name: Run Unit Tests with Jacoco and PIT
       run: xvfb-run mvn verify
-      working-directory: expense-tracker-app
+      working-directory: ./expense-tracker-app
 
     - name: Archive Surefire Test Report and Site
       uses: actions/upload-artifact@v2
@@ -34,15 +34,15 @@ jobs:
       with:
         name: surefire-report
         path: |
-          expense-tracker-app/target/surefire-reports
-          expense-tracker-app/target/site/surefire
+          "**/target/surefire-reports"
+          "**/target/site/surefire"
 
     - name: Archive JaCoCo Report and Site
       uses: actions/upload-artifact@v2
       if: ${{ always() }}
       with:
         name: jacoco-report
-        path: expense-tracker-app/target/site/jacoco
+        path: "**/target/site/jacoco"
 
     - name: Archive PIT Report and Site
       uses: actions/upload-artifact@v2
@@ -50,8 +50,8 @@ jobs:
       with:
         name: pit-report
         path: |
-          expense-tracker-app/target/pit-reports
-          expense-tracker-app/target/site/pitest
+          "**/target/pit-reports"
+          "**/target/site/pitest"
 
   integration-tests:
     runs-on: ubuntu-latest
@@ -74,7 +74,7 @@ jobs:
 
     - name: Run Integration Tests
       run: xvfb-run mvn verify -Pintegration-test
-      working-directory: expense-tracker-app
+      working-directory: ./expense-tracker-app
 
     - name: Archive Failsafe Test Report and Site
       uses: actions/upload-artifact@v2
@@ -82,12 +82,5 @@ jobs:
       with:
         name: failsafe-report
         path: |
-          expense-tracker-app/target/failsafe-reports
-          expense-tracker-app/target/site/failsafe
-
-    - name: Archive Maven Site
-      uses: actions/upload-artifact@v2
-      if: ${{ always() }}
-      with:
-        name: maven-site
-        path: expense-tracker-app/target/site
+          "**/target/failsafe-reports"
+          "**/target/site/failsafe"
