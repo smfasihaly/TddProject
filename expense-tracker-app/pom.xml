@@ -188,7 +188,6 @@
 								</configuration>
 							</execution>
 						</executions>
-					
 					</plugin>
 					<plugin>
 						<artifactId>maven-surefire-report-plugin</artifactId>
@@ -246,7 +245,7 @@
 								<param>
 									com.tdd.expensetracker.repository.**</param>
 								<param>
-									com.tdd.expensetracker.view.swing.**</param> 
+									com.tdd.expensetracker.view.swing.**</param>
 								<param>
 									com.tdd.expensetracker.model.**</param>
 								<param>
