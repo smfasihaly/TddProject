@@ -34,10 +34,10 @@ jobs:
       with:
         name: unit-test-reports
         path: |
-          target/surefire-reports/*
-          target/site/jacoco/*
-          target/pit-reports/*  
-          target/site
+          expense-tracker-app/target/surefire-reports/*
+          expense-tracker-app/target/site/jacoco/*
+          expense-tracker-app/target/pit-reports/*
+          expense-tracker-app/target/site/*
           
           
   integration-tests:
@@ -67,6 +67,6 @@ jobs:
       with:
         name: integration-test-reports
         path: |
-          target/failsafe-reports/*
-          target/site
+          expense-tracker-app/target/failsafe-reports/*
+          expense-tracker-app/target/site/*
 
