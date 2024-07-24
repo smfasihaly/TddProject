@@ -241,6 +241,31 @@
 							<targetTests>
 								<param>com.tdd.expensetracker.*.*</param>
 							</targetTests>
+							<excludedClasses>
+								<param>
+									com.tdd.expensetracker.repository.**</param>
+								<param>
+									com.tdd.expensetracker.view.swing.**</param>
+								<param>
+									com.tdd.expensetracker.model.**</param>
+								<param>
+									com.tdd.expensetracker.app.**</param>
+							</excludedClasses>
+							<excludedTestClasses>
+								<param>
+									com.tdd.expensetracker.controller.**IT</param>
+								<param>
+									com.tdd.expensetracker.bdd.**</param>
+
+								<param>
+									com.tdd.expensetracker.**E2E</param>
+								<param>
+									com.tdd.expensetracker.repository.**</param>
+								<param>
+									com.tdd.expensetracker.view.swing.**</param>
+								<param>
+									com.tdd.expensetracker.racecondition.**</param>
+							</excludedTestClasses>
 							<mutators>
 								<mutator>DEFAULTS</mutator>
 							</mutators>
