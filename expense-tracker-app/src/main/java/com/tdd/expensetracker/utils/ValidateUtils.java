@@ -1,41 +1,56 @@
-package com.tdd.expensetracker.utils;
-
-import java.time.LocalDate;
-
-public class ValidateUtils {
-
-	private ValidateUtils() {
-	}
-
-	public static boolean validateRequiredString(String string,String fieldName ) throws ValidationException {
-
-		if (string == null || string.trim().isEmpty()) {
-			throw new ValidationException(fieldName +" is required and cannot be null or empty");
+	package com.tdd.expensetracker.utils;
+	
+	import java.time.LocalDate;
+	
+	import org.apache.logging.log4j.LogManager;
+	import org.apache.logging.log4j.Logger;
+	
+	public class ValidateUtils {
+	
+		private static final Logger LOGGER = LogManager.getLogger(ValidateUtils.class);
+	
+		private ValidateUtils() {
+			LOGGER.info("ValidateUtils class initialized");
 		}
-
-		return true;
-	}
-
-
-	public static boolean validateAmount(Double amount) throws ValidationException {
-
-		if (amount <= 0) {
-			throw new ValidationException("Amount must be greater than zero");
+	
+		public static boolean validateRequiredString(String string, String fieldName) throws ValidationException {
+			LOGGER.debug("Validating required string for field: {}", fieldName);
+	
+			if (string == null || string.trim().isEmpty()) {
+				LOGGER.error("Validation failed: {} is null or empty", fieldName);
+				throw new ValidationException(fieldName + " is required and cannot be null or empty");
+			}
+	
+			LOGGER.debug("Validation passed for field: {}", fieldName);
+			return true;
 		}
-
-		return true;
-	}
-
-	public static boolean validateDate(LocalDate date) throws ValidationException {
-
-		if (date == null) {
-			throw new ValidationException("Date is required and cannot be null");
+	
+		public static boolean validateAmount(Double amount) throws ValidationException {
+			LOGGER.debug("Validating amount: {}", amount);
+	
+			if (amount <= 0) {
+				LOGGER.error("Validation failed: Amount must be greater than zero, but was {}", amount);
+				throw new ValidationException("Amount must be greater than zero");
+			}
+	
+			LOGGER.debug("Validation passed for amount: {}", amount);
+			return true;
 		}
-
-		if (date.isAfter(LocalDate.now())) {
-			throw new ValidationException("Date cannot be in the future");
+	
+		public static boolean validateDate(LocalDate date) throws ValidationException {
+			LOGGER.debug("Validating date: {}", date);
+	
+			if (date == null) {
+				LOGGER.error("Validation failed: Date is null");
+				throw new ValidationException("Date is required and cannot be null");
+			}
+	
+			if (date.isAfter(LocalDate.now())) {
+				LOGGER.error("Validation failed: Date {} is in the future", date);
+				throw new ValidationException("Date cannot be in the future");
+			}
+	
+			LOGGER.debug("Validation passed for date: {}", date);
+			return true;
 		}
-
-		return true;
 	}
-}

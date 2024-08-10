@@ -11,6 +11,7 @@
 	<name>expense-tracker-app</name>
 
 	<properties>
+		<log4j-api-version>2.13.0</log4j-api-version>
 		<wait-log>ready for connections. Bind-address</wait-log>
 		<docker-maven-plugin-version>0.34.1</docker-maven-plugin-version>
 		<maven-surefire-report-plugin-version>3.2.5</maven-surefire-report-plugin-version>
@@ -62,6 +63,16 @@
 			<artifactId>junit</artifactId>
 			<version>${junit.version}</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>${log4j-api-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>${log4j-api-version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.h2database</groupId>
@@ -183,7 +194,7 @@
 							<excludes>
 								<exclude>**/app/*.*</exclude>
 								<exclude>**/model/*.*</exclude>
-								
+
 							</excludes>
 						</configuration>
 						<executions>
@@ -279,7 +290,7 @@
 									com.tdd.expensetracker.model.**</param>
 								<param>
 									com.tdd.expensetracker.app.**</param>
-									
+
 							</excludedClasses>
 							<excludedTestClasses>
 								<param>
@@ -353,7 +364,7 @@
 						<artifactId>maven-failsafe-plugin</artifactId>
 						<version>${maven-surefire-plugin-version}</version>
 						<executions>
-						<execution>
+							<execution>
 								<id>default-it</id>
 								<goals>
 									<goal>integration-test</goal>
