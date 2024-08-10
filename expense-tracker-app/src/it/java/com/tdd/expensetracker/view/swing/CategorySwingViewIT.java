@@ -155,7 +155,7 @@ public class CategorySwingViewIT extends AssertJSwingJUnitTestCase {
 		await().atMost(5, TimeUnit.SECONDS)
 		.untilAsserted(() -> assertThat(window.label("errorMessageLabel").text().trim()).isNotEmpty());
 
-		assertThat(window.list().contents()).containsExactly(getDisplayString(category));
+		assertThat(window.list().contents()).isEmpty();
 		window.label("errorMessageLabel").requireText("Category does not exist with id 1: " + category);
 	}
 

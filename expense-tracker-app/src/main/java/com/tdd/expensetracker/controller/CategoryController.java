@@ -54,7 +54,7 @@ public class CategoryController {
 		Category existingCategory = categoryRepository.findById(categoryToDelete.getId());
 
 		if (existingCategory == null) {
-			categoryView.showError("Category does not exist with id " + categoryToDelete.getId(), categoryToDelete);
+			categoryView.showErrorCategoryNotFound("Category does not exist with id " + categoryToDelete.getId(), categoryToDelete);
 			return;
 		}
 		
@@ -92,9 +92,9 @@ public class CategoryController {
 		categoryRepository.update(categoryToUpdate);
 		categoryView.categoryUpdated(categoryToUpdate);
 	}
-	
+	 
 	public void getAllExpenses(Category category) {
-		
+		 
 		List<Expense> expenses = category.getExpenses();
 		if(expenses.size() == 0 ) {
 			categoryView.showError("No Expense created for this category", category);

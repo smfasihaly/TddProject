@@ -81,6 +81,7 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Show Expenses")).requireDisabled();
 		window.button(JButtonMatcher.withText("Update Category")).requireNotVisible();
 		window.button(JButtonMatcher.withText("Cancel")).requireNotVisible();
+		window.button(JButtonMatcher.withText("Open Expense Form")).requireVisible().requireEnabled();
 		window.label("errorMessageLabel").requireText(" ");
 	}
 
@@ -91,25 +92,12 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 		setFieldValues("name", "");
 		window.button(JButtonMatcher.withText("Add Category")).requireEnabled();
 	}
-
+ 
 	@Test
 	public void testWhenNameRequiredFieldIsBlankThenAddButtonShouldBeDisabled() {
 
 		// empty Name
 		setFieldValues("", "1000");
-		window.button(JButtonMatcher.withText("Add Category")).requireDisabled();
-	}
-
-	@Test
-	public void testFormShouldBeResetAfterAddingCategory() {
-
-		setFieldValues("name", "description");
-
-		window.button(JButtonMatcher.withText("Add Category")).click();
-		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> window.textBox("descriptionTextBox").requireText(""));
-		JTextField idTextBox = window.robot().finder().findByName("idTextBox", JTextField.class, false);
-		assertThat("").isEqualTo(idTextBox.getText());
-		window.textBox("nameTextBox").requireText("");
 		window.button(JButtonMatcher.withText("Add Category")).requireDisabled();
 	}
 
@@ -197,48 +185,6 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 	}
 
 	@Test
-	public void testAddCategoryButtonShouldBeVisibleAndUpdateCategoryAndCancelButtonShouldBeHiddenAfterUpdatingCategory() {
-
-		GuiActionRunner.execute(
-				() -> categorySwingView.getListCategoryModel().addElement(new Category("1", "bills", "utilities")));
-
-		window.list("categoryList").selectItem(0);
-		window.button(JButtonMatcher.withText("Update Selected")).click();
-		window.textBox("nameTextBox").setText("updated name");
-
-		JButtonFixture updateButton = window.button(JButtonMatcher.withText("Update Category"));
-		updateButton.click();
-		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> updateButton.requireNotVisible());
-
-		JButtonFixture cancelButton = window.button(JButtonMatcher.withText("Cancel"));
-		cancelButton.requireNotVisible();
-
-		JButtonFixture addButton = window.button(JButtonMatcher.withText("Add Category"));
-		addButton.requireVisible();
-		addButton.requireDisabled();
-
-	}
-
-	@Test
-	public void testFormShouldBeResetAfterUpdatingCategory() {
-
-		GuiActionRunner.execute(
-				() -> categorySwingView.getListCategoryModel().addElement(new Category("1", "bills", "utilities")));
-
-		window.list("categoryList").selectItem(0);
-		window.button(JButtonMatcher.withText("Update Selected")).click();
-		window.textBox("nameTextBox").setText("updated name");
-
-		window.button(JButtonMatcher.withText("Update Category")).click();
-
-		JTextField idTextBox = window.robot().finder().findByName("idTextBox", JTextField.class, false);
-		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> assertThat("").isEqualTo(idTextBox.getText()));
-		window.textBox("nameTextBox").requireText("");
-		window.textBox("descriptionTextBox").requireText("");
-		window.button(JButtonMatcher.withText("Add Category")).requireDisabled();
-	}
-
-	@Test
 	public void testFormResetAfterCancelingUpdate() {
 
 		GuiActionRunner.execute(
@@ -270,7 +216,7 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 			expenseTable.setVisible(true);
 			totalLabel.setVisible(true);
 		});
-		
+
 		window.label("crossLabel").click();
 
 		assertThat(expenseTable.isVisible()).isFalse();
@@ -311,6 +257,19 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 	}
 
 	@Test
+	public void testFormShouldBeResetAfterAddingCategory() {
+
+		Category category = new Category("1", "bills", "utilities");
+
+		categorySwingView.categoryAdded(category);
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> window.textBox("descriptionTextBox").requireText(""));
+		JTextField idTextBox = window.robot().finder().findByName("idTextBox", JTextField.class, false);
+		assertThat("").isEqualTo(idTextBox.getText());
+		window.textBox("nameTextBox").requireText("");
+		window.button(JButtonMatcher.withText("Add Category")).requireDisabled();
+	}
+
+	@Test
 	public void testCategoryDeleteShouldRemoveTheCategoryFromTheListAndResetTheErrorLabel() {
 
 		Category category = new Category("1", "bills", "utilities");
@@ -344,6 +303,24 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 	}
 
 	@Test
+	public void testFormShouldBeResetAfterUpdatingCategory() {
+
+		Category category = new Category("1", "bills", "utilities");
+
+		categorySwingView.categoryAdded(category);
+
+		Category updatedCategory = new Category("1", "testCategory2", "test");
+		// execute
+		categorySwingView.categoryUpdated(updatedCategory);
+
+		JTextField idTextBox = window.robot().finder().findByName("idTextBox", JTextField.class, false);
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> assertThat("").isEqualTo(idTextBox.getText()));
+		window.textBox("nameTextBox").requireText("");
+		window.textBox("descriptionTextBox").requireText("");
+		window.button(JButtonMatcher.withText("Add Category")).requireDisabled();
+	}
+
+	@Test
 	public void testCategoryUpdateShouldNotUpdateWhenCategoryNotFound() {
 
 		Category category = new Category("1", "bills", "utilities");
@@ -355,6 +332,28 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 
 		// Verify that the original category remains unchanged in the list
 		assertThat(window.list().contents()).containsExactly(getDisplayString(category));
+
+	}
+
+	@Test
+	public void testAddCategoryButtonShouldBeVisibleAndUpdateCategoryAndCancelButtonShouldBeHiddenAfterUpdatingCategory() {
+
+		Category category = new Category("1", "bills", "utilities");
+		// This category has a different ID and should not be found in the list
+		Category updatedCategory = new Category("2", "testCategory2", "test");
+
+		categorySwingView.categoryAdded(category);
+		categorySwingView.categoryUpdated(updatedCategory);
+
+		JButtonFixture updateButton = window.button(JButtonMatcher.withText("Update Category"));
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> updateButton.requireNotVisible());
+
+		JButtonFixture cancelButton = window.button(JButtonMatcher.withText("Cancel"));
+		cancelButton.requireNotVisible();
+
+		JButtonFixture addButton = window.button(JButtonMatcher.withText("Add Category"));
+		addButton.requireVisible();
+		addButton.requireDisabled();
 
 	}
 

@@ -18,6 +18,8 @@ public interface CategoryView {
 	void categoryUpdated(Category categoryToUpdate);
 
 	void getAllExpenses(List<Expense> expenses);
+
+	void showErrorCategoryNotFound(String message, Category category);
 	
 
 

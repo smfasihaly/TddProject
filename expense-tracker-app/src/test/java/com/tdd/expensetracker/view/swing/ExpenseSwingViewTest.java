@@ -76,7 +76,7 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 
 		JTextField idTextBox = window.robot().finder().findByName("idTextBox", JTextField.class, false);
 		assertThat(idTextBox.isVisible()).isFalse();
-		JDateChooser jdateChooser = window.robot().finder().findByName("JDateChooser", JDateChooser.class, false);
+		JDateChooser jdateChooser = window.robot().finder().findByName("expenseDateChooser",JDateChooser.class, false);
 		assertThat(jdateChooser.isVisible()).isTrue();
 		JTextFieldDateEditor dateEditor = (JTextFieldDateEditor) jdateChooser.getDateEditor();
 		assertThat(dateEditor.isEditable()).isFalse();
@@ -91,6 +91,7 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Add Expense")).requireDisabled();
 		window.list("expenseList");
 		window.button(JButtonMatcher.withText("Delete Selected")).requireDisabled();
+		window.button(JButtonMatcher.withText("Open Category Form")).requireVisible().requireEnabled();
 		window.button(JButtonMatcher.withText("Update Selected")).requireDisabled();
 		window.button(JButtonMatcher.withText("Update Expense")).requireNotVisible();
 		window.button(JButtonMatcher.withText("Cancel")).requireNotVisible();
@@ -167,23 +168,7 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		amountTxtBox.requireText("1245");
 	}
 
-	@Test
-	public void testFormShouldBeResetAfterAddingCategory() {
-
-		setFieldValues("description", "1000", LocalDate.now(), existingCategory);
-		window.button(JButtonMatcher.withText("Add Expense")).click();
-
-		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> window.textBox("descriptionTextBox").requireText(""));
-		window.textBox("amountTextBox").requireText("");
-		JDateChooser jdateChooser = window.robot().finder().findByName("JDateChooser", JDateChooser.class, false);
-		assertThat(jdateChooser.getDate()).isNull();
-		window.comboBox("categoryComboBox").requireNoSelection();
-		window.button(JButtonMatcher.withText("Add Expense")).requireDisabled();
-		window.button(JButtonMatcher.withText("Update Expense")).requireNotVisible();
-		window.button(JButtonMatcher.withText("Cancel")).requireNotVisible();
-
-
-	}
+	
 
 	@Test
 	public void testDeleteSelectedAndUpdateSelectedButtonShouldBeEnabledOnlyWhenAExpenseIsSelected() {
@@ -205,6 +190,29 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 
 	@Test
 	public void testSelectedExpenseShouldPopulateAllFieldsWhenUpdateSeletedButtonIsClicked() {
+
+		Expense expense = new Expense("1", 5000d, "testExpense", LocalDate.now(), existingCategory);
+		GuiActionRunner.execute(() -> expenseSwingView.getListExpenseModel().addElement(expense));
+
+		window.list("expenseList").selectItem(0);
+
+		JButtonFixture updateSelectedButton = window.button(JButtonMatcher.withText("Update Selected"));
+		updateSelectedButton.click();
+		
+		window.textBox("descriptionTextBox").requireText("testExpense");
+		window.textBox("amountTextBox").requireText(String.valueOf(5000d));
+		window.comboBox("categoryComboBox").requireSelection(0);
+		JDateChooser jdateChooser = window.robot().finder().findByName("expenseDateChooser",JDateChooser.class,
+				true);
+		Date localDateToDate = java.sql.Date.valueOf(LocalDate.now());
+		assertThat(jdateChooser.getDate()).isEqualTo(localDateToDate);
+		
+
+	}
+	
+	
+	@Test
+	public void testWhenAnyRequiredFieldsAreBlankThenUpdateButtonShouldBeDisabled() {
 
 		Expense expense = new Expense("1", 5000d, "testExpense", LocalDate.now(), existingCategory);
 		GuiActionRunner.execute(() -> expenseSwingView.getListExpenseModel().addElement(expense));
@@ -238,6 +246,7 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Add Expense")).requireDisabled();
 
 	}
+
 
 	@Test
 	public void testUpdateExpenseAndCancelButtonShouldBeVisibleAndAddExpenseButtonShouldBeHiddenWhenUpdateSeletedButtonIsClicked() {
@@ -277,52 +286,9 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Update Expense")).requireDisabled();
 	}
 
-	@Test
-	public void testAddExpenseButtonShouldBeVisibleAndUpdateExpenseAndCancelButtonShouldBeHiddenAfterUpdatingExpense() {
+	
 
-		JTextComponentFixture descriptionTextBox = window.textBox("descriptionTextBox");
-
-		Expense expense = new Expense("1", 5000d, "testExpense", LocalDate.now(), existingCategory);
-		GuiActionRunner.execute(() -> expenseSwingView.getListExpenseModel().addElement(expense));
-
-		window.list("expenseList").selectItem(0);
-
-		JButtonFixture updateSelectedButton = window.button(JButtonMatcher.withText("Update Selected"));
-		updateSelectedButton.click();
-
-		descriptionTextBox.setText("updated description");
-
-		JButtonFixture updateButton = window.button(JButtonMatcher.withText("Update Expense"));
-		updateButton.click();
-		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> updateButton.requireNotVisible());
-
-		JButtonFixture cancelButton = window.button(JButtonMatcher.withText("Cancel"));
-		cancelButton.requireNotVisible();
-
-		JButtonFixture addButton = window.button(JButtonMatcher.withText("Add Expense"));
-		addButton.requireVisible();
-		addButton.requireDisabled();
-
-	}
-
-	@Test
-	public void testFormShouldBeResetAfterUpdatingExpense() {
-		Expense expense = new Expense("1", 5000d, "testExpense", LocalDate.now(), existingCategory);
-		GuiActionRunner.execute(() -> expenseSwingView.getListExpenseModel().addElement(expense));
-
-		window.list("expenseList").selectItem(0);
-		window.button(JButtonMatcher.withText("Update Selected")).click();
-		window.textBox("descriptionTextBox").setText("updated description");
-		window.button(JButtonMatcher.withText("Update Expense")).click();
-		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> window.textBox("descriptionTextBox").requireText(""));
-		JTextField idTextBox = window.robot().finder().findByName("idTextBox", JTextField.class, false);
-		assertThat("").isEqualTo(idTextBox.getText());
-		window.textBox("amountTextBox").requireText("");
-		JDateChooser jdateChooser = window.robot().finder().findByName("JDateChooser", JDateChooser.class, false);
-		assertThat(jdateChooser.getDate()).isNull();
-		window.comboBox("categoryComboBox").requireNoSelection();
-		window.button(JButtonMatcher.withText("Add Expense")).requireDisabled();
-	}
+	
 
 	@Test
 	public void testFormResetAfterCancelingUpdate() {
@@ -337,7 +303,7 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		assertThat("").isEqualTo(idTextBox.getText());
 		window.textBox("descriptionTextBox").requireText("");
 		window.textBox("amountTextBox").requireText("");
-		JDateChooser jdateChooser = window.robot().finder().findByName("JDateChooser", JDateChooser.class, false);
+		JDateChooser jdateChooser = window.robot().finder().findByName("expenseDateChooser",JDateChooser.class, false);
 		assertThat(jdateChooser.getDate()).isNull();
 		window.comboBox("categoryComboBox").requireNoSelection();
 		window.button(JButtonMatcher.withText("Add Expense")).requireDisabled();
@@ -380,6 +346,25 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		window.label("errorMessageLabel").requireText(" ");
 		window.label("totalLabel").requireText("Total: 5000.0");
 	}
+	
+	@Test
+	public void testFormShouldBeResetAfterAddingCategory() {
+
+		Expense expense = new Expense("1", 5000d, "testExpense", LocalDate.now(), existingCategory);
+
+		expenseSwingView.expenseAdded(expense);
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> window.textBox("descriptionTextBox").requireText(""));
+		window.textBox("amountTextBox").requireText("");
+		JDateChooser jdateChooser = window.robot().finder().findByName("expenseDateChooser",JDateChooser.class, false);
+		assertThat(jdateChooser.getDate()).isNull();
+		window.comboBox("categoryComboBox").requireNoSelection();
+		window.button(JButtonMatcher.withText("Add Expense")).requireDisabled();
+		window.button(JButtonMatcher.withText("Update Expense")).requireNotVisible();
+		window.button(JButtonMatcher.withText("Cancel")).requireNotVisible();
+
+
+	}
+	
 
 	@Test
 	public void testExpenseDeleteShouldRemoveTheExpenseFromTheListAndResetTheErrorLabelAndUpdateTotal() {
@@ -415,6 +400,49 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		assertThat(listContents).containsExactly(getDisplayString(updatedExpense));
 		window.label("errorMessageLabel").requireText(" ");
 		window.label("totalLabel").requireText("Total: 50.0");
+	}
+	
+	@Test
+	public void testFormShouldBeResetAfterUpdatingExpense() {
+		Expense expense = new Expense("1", 5000d, "testExpense", LocalDate.now(), existingCategory);
+
+		expenseSwingView.expenseAdded(expense);
+		
+		Expense updatedExpense = new Expense("1", 50d, "testExpense2", LocalDate.now(), existingCategory);
+		// execute
+		expenseSwingView.expenseUpdated(updatedExpense);
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> window.textBox("descriptionTextBox").requireText(""));
+		JTextField idTextBox = window.robot().finder().findByName("idTextBox", JTextField.class, false);
+		assertThat("").isEqualTo(idTextBox.getText());
+		window.textBox("amountTextBox").requireText("");
+		JDateChooser jdateChooser = window.robot().finder().findByName("expenseDateChooser",JDateChooser.class, false);
+		assertThat(jdateChooser.getDate()).isNull();
+		window.comboBox("categoryComboBox").requireNoSelection();
+		window.button(JButtonMatcher.withText("Add Expense")).requireDisabled();
+	}
+	
+	@Test
+	public void testAddExpenseButtonShouldBeVisibleAndUpdateExpenseAndCancelButtonShouldBeHiddenAfterUpdatingExpense() {
+
+		Expense expense = new Expense("1", 5000d, "testExpense", LocalDate.now(), existingCategory);
+
+		expenseSwingView.expenseAdded(expense);
+		
+		Expense updatedExpense = new Expense("1", 50d, "testExpense2", LocalDate.now(), existingCategory);
+		// execute
+		expenseSwingView.expenseUpdated(updatedExpense);
+
+		JButtonFixture updateButton = window.button(JButtonMatcher.withText("Update Expense"));
+
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> updateButton.requireNotVisible());
+
+		JButtonFixture cancelButton = window.button(JButtonMatcher.withText("Cancel"));
+		cancelButton.requireNotVisible();
+
+		JButtonFixture addButton = window.button(JButtonMatcher.withText("Add Expense"));
+		addButton.requireVisible();
+		addButton.requireDisabled();
+
 	}
 
 	@Test
@@ -476,6 +504,8 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		await().atMost(5, TimeUnit.SECONDS)
 				.untilAsserted(() -> verify(expenseController).updateExpense(updatedExpense));
 	}
+	
+	
 
 	private void setFieldValues(String description, String amount, LocalDate date, Category category) {
 
@@ -488,7 +518,7 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		}
 		if (date != null) {
 
-			JDateChooser jdateChooser = window.robot().finder().findByName("JDateChooser", JDateChooser.class, false);
+			JDateChooser jdateChooser = window.robot().finder().findByName("expenseDateChooser",JDateChooser.class, false);
 			GuiActionRunner.execute(() -> {
 				Date localDateToDate = java.sql.Date.valueOf(date);
 				jdateChooser.setDate(localDateToDate);
@@ -496,13 +526,13 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		}
 	}
 
-	private void resetAllFieldsToBlank() {
+	private void resetAllFieldsToBlank() { 
 		window.textBox("descriptionTextBox").setText("");
 		window.textBox("amountTextBox").setText("");
 		window.textBox("descriptionTextBox").setText("");
 		window.comboBox("categoryComboBox").clearSelection();
 
-		JDateChooser jdateChooser = window.robot().finder().findByName("JDateChooser", JDateChooser.class, false);
+		JDateChooser jdateChooser = window.robot().finder().findByName("expenseDateChooser",JDateChooser.class, false);
 		GuiActionRunner.execute(() -> {
 
 			jdateChooser.setDate(null);

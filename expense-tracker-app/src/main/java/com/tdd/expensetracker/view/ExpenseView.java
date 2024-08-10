@@ -11,13 +11,15 @@ public interface ExpenseView {
 
 	void expenseAdded(Expense expense);
 
-	void showError(String message, Expense existingExpense);
+	void showError(String message, Expense expense);
 
 	void expenseDeleted(Expense expense);
 
 	void expenseUpdated(Expense updatedExpense);
 
 	void showAllCategory(List<Category> categories);
+
+	void showErrorExpenseNotFound(String message, Expense expense);
 
 
 }

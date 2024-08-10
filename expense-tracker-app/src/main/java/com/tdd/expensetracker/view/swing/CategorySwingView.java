@@ -62,17 +62,15 @@ public class CategorySwingView extends JFrame implements CategoryView {
 
 	private JTextField txtID;
 	private CategoryController categoryController;
+	private ExpenseSwingView expenseView;
 	private JTable expenseTable;
 	private JLabel lblHideTable;
 	private JLabel lblTotal;
+	private JButton btnExpenseForm;
 
 	DefaultListModel<Category> getListCategoryModel() {
 		return listCategoryModel;
 	}
-
-//	DefaultListModel<Expense> getListExpenseModel() {
-//		return listExpenseModel;
-//	}
 
 	public void setCategoryController(CategoryController categoryController) {
 		this.categoryController = categoryController;
@@ -101,6 +99,7 @@ public class CategorySwingView extends JFrame implements CategoryView {
 
 		listCategoryModel = new DefaultListModel<Category>();
 		listExpenseModel = new DefaultListModel<Expense>();
+
 //		Category categorysample = new Category("1", "namererere", "description");
 //		categorysample.setExpenses(asList(new Expense(5000d, "nasdsddsdsme", LocalDate.now(), null)));
 //		Category categorysample2 = new Category("2", "nam2e", "de2s2c2ription");
@@ -135,8 +134,7 @@ public class CategorySwingView extends JFrame implements CategoryView {
 		gbl_contentPane.columnWidths = new int[] { 0, 0, 0, 0, 0, 0 };
 		gbl_contentPane.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 		gbl_contentPane.columnWeights = new double[] { 1.0, 1.0, 1.0, 0.0, 0.0, Double.MIN_VALUE };
-		gbl_contentPane.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0,
-				Double.MIN_VALUE };
+		gbl_contentPane.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0 };
 		contentPane.setLayout(gbl_contentPane);
 
 		txtID = new JTextField();
@@ -197,7 +195,7 @@ public class CategorySwingView extends JFrame implements CategoryView {
 
 				Category category = new Category(txtName.getText(), txtDescription.getText());
 				categoryController.newCategory(category);
-				resetFormState();
+
 			}).start();
 		});
 		btnAddCategory.setEnabled(false);
@@ -226,7 +224,7 @@ public class CategorySwingView extends JFrame implements CategoryView {
 
 				Category category = new Category(txtID.getText(), txtName.getText(), txtDescription.getText());
 				categoryController.updateCategory(category);
-				resetFormState();
+
 			}).start();
 		});
 		btnUpdateCategory.setEnabled(false);
@@ -278,9 +276,9 @@ public class CategorySwingView extends JFrame implements CategoryView {
 
 		btnShowExpenses = new JButton("Show Expenses");
 		btnShowExpenses.addActionListener(e -> {
-			Category selectedCategory = categoryList.getSelectedValue();
+			Category selectedCategory = listCategoryModel.getElementAt(categoryList.getSelectedIndex());
 			categoryController.getAllExpenses(selectedCategory);
-			
+
 		});
 
 		lblHideTable = new JLabel("X");
@@ -315,7 +313,7 @@ public class CategorySwingView extends JFrame implements CategoryView {
 
 			Category selectedCategory = categoryList.getSelectedValue();
 			txtID.setText(selectedCategory.getId());
-			txtName.setText(selectedCategory.getName());
+			txtName.setText(selectedCategory.getName()); 
 			txtDescription.setText(selectedCategory.getDescription());
 
 			btnAddCategory.setVisible(false);
@@ -354,15 +352,17 @@ public class CategorySwingView extends JFrame implements CategoryView {
 		lblError.setForeground(new Color(237, 51, 59));
 		lblError.setName("errorMessageLabel");
 		GridBagConstraints gbc_lblError = new GridBagConstraints();
+		gbc_lblError.gridwidth = 5;
 		gbc_lblError.insets = new Insets(0, 0, 5, 5);
 		gbc_lblError.gridx = 0;
-		gbc_lblError.gridy = 8;
+		gbc_lblError.gridy = 9;
 		lblError.setForeground(new Color(237, 51, 59));
 		lblError.setName("errorMessageLabel");
 		contentPane.add(lblError, gbc_lblError);
 
 		// Create the table and set its model
 		expenseTable = new JTable();
+		expenseTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		expenseTable.setName("expenseTable");
 		expenseTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		expenseTable.setRowSelectionAllowed(true); // Allow row selection
@@ -398,8 +398,24 @@ public class CategorySwingView extends JFrame implements CategoryView {
 		gbc_lblTotal.gridwidth = 3;
 		gbc_lblTotal.insets = new Insets(0, 0, 0, 5);
 		gbc_lblTotal.gridx = 0;
-		gbc_lblTotal.gridy = 9;
+		gbc_lblTotal.gridy = 10;
 		contentPane.add(lblTotal, gbc_lblTotal);
+
+		btnExpenseForm = new JButton("Open Expense Form");
+		btnExpenseForm.addActionListener(e -> {
+			
+			
+			expenseView.setVisible(true);	
+			this.dispose();
+			resetFormState();
+			resetErrorLabel();
+		});
+		GridBagConstraints gbc_btnExpenseForm = new GridBagConstraints();
+		gbc_btnExpenseForm.fill = GridBagConstraints.HORIZONTAL;
+		gbc_btnExpenseForm.gridwidth = 2;
+		gbc_btnExpenseForm.gridx = 3;
+		gbc_btnExpenseForm.gridy = 10;
+		contentPane.add(btnExpenseForm, gbc_btnExpenseForm);
 
 	}
 
@@ -407,7 +423,7 @@ public class CategorySwingView extends JFrame implements CategoryView {
 		return category.getId() + " | " + category.getName() + " | " + category.getDescription();
 
 	}
-	
+
 	private void setTotalAmountLabel() {
 		double sum = 0.0;
 		Enumeration<Expense> elements = listExpenseModel.elements();
@@ -415,14 +431,14 @@ public class CategorySwingView extends JFrame implements CategoryView {
 			Expense expense = elements.nextElement();
 			sum += expense.getAmount();
 		}
-		lblTotal.setText("Total: "+Double.toString(sum));
+		lblTotal.setText("Total: " + Double.toString(sum));
 	}
-	
+
 	private void createTableModel() {
 		AbstractTableModel tableModel = new AbstractTableModel() {
 			private static final long serialVersionUID = 1L;
 			private final String[] columnNames = { "Description", "Amount", "Date" };
-			
+
 			@Override
 			public int getRowCount() {
 				return listExpenseModel.getSize();
@@ -498,6 +514,7 @@ public class CategorySwingView extends JFrame implements CategoryView {
 			listCategoryModel.addElement(category);
 			resetErrorLabel();
 		});
+		resetFormState();
 	}
 
 	private void resetErrorLabel() {
@@ -532,7 +549,21 @@ public class CategorySwingView extends JFrame implements CategoryView {
 			listCategoryModel.set(index, categoryToUpdate);
 			resetErrorLabel();
 		});
+		resetFormState();
 	}
-	
+
+	public void setExpenseView(ExpenseSwingView expenseView) {
+		this.expenseView = expenseView;
+
+	}
+
+	@Override
+	public void showErrorCategoryNotFound(String message, Category category) {
+		SwingUtilities.invokeLater(() -> {
+			lblError.setText(message + ": " + category);
+			listCategoryModel.removeElement(category);
+		});
+		
+	}
 
 }

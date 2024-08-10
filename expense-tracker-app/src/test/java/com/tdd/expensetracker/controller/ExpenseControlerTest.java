@@ -213,7 +213,7 @@ public class ExpenseControlerTest {
 
 		expenseController.deleteExpense(expenseToDelete);
 
-		verify(expenseView).showError("Expense does not exist with id 1", expenseToDelete);
+		verify(expenseView).showErrorExpenseNotFound("Expense does not exist with id 1", expenseToDelete);
 		verifyNoMoreInteractions(ignoreStubs(expenseRepository));
 	}
 

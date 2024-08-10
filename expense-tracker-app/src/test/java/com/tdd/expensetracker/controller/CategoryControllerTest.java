@@ -122,7 +122,7 @@ public class CategoryControllerTest {
 		Category categoryToDelete = new Category("1", "name1","description1");
 		when(categoryRepository.findById("1")).thenReturn(null);
 		categoryController.deleteCategory(categoryToDelete);
-		verify(categoryView).showError("Category does not exist with id 1", categoryToDelete);
+		verify(categoryView).showErrorCategoryNotFound("Category does not exist with id 1", categoryToDelete);
 		verifyNoMoreInteractions(ignoreStubs(categoryRepository));
 	}
 	

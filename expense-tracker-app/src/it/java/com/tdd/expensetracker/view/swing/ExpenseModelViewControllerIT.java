@@ -151,7 +151,7 @@ public class ExpenseModelViewControllerIT extends AssertJSwingJUnitTestCase {
 		}
 		if (date != null) {
 
-			JDateChooser jdateChooser = window.robot().finder().findByName("JDateChooser", JDateChooser.class, false);
+			JDateChooser jdateChooser = window.robot().finder().findByName("expenseDateChooser", JDateChooser.class, false);
 			GuiActionRunner.execute(() -> {
 				Date localDateToDate = java.sql.Date.valueOf(date);
 				jdateChooser.setDate(localDateToDate);

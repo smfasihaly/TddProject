@@ -31,7 +31,7 @@ public class ExpenseController {
 		boolean isValid = validateExpense(expense);
 
 		if (!isValid) {
-			return;
+			return; 
 		}
 
 		Expense existingExpense = expenseRepository.findById(expense.getId());
@@ -59,7 +59,7 @@ public class ExpenseController {
 		Expense existingExpense = expenseRepository.findById(expenseToDelete.getId());
 
 		if (existingExpense == null) {
-			this.expenseView.showError("Expense does not exist with id " + expenseToDelete.getId(), expenseToDelete);
+			this.expenseView.showErrorExpenseNotFound("Expense does not exist with id " + expenseToDelete.getId(), expenseToDelete);
 			return;
 		}
 		expenseRepository.delete(expenseToDelete);

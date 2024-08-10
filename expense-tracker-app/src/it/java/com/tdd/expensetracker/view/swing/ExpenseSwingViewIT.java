@@ -166,7 +166,7 @@ public class ExpenseSwingViewIT extends AssertJSwingJUnitTestCase {
 		await().atMost(5, TimeUnit.SECONDS)
 				.untilAsserted(() -> assertThat(window.label("errorMessageLabel").text().trim()).isNotEmpty());
 
-		assertThat(window.list().contents()).containsExactly(getDisplayString(expense));
+		assertThat(window.list().contents()).isEmpty();
 		window.label("errorMessageLabel").requireText("Expense does not exist with id 1: " + expense);
 
 	}
@@ -234,7 +234,7 @@ public class ExpenseSwingViewIT extends AssertJSwingJUnitTestCase {
 		}
 		if (date != null) {
 
-			JDateChooser jdateChooser = window.robot().finder().findByName("JDateChooser", JDateChooser.class, false);
+			JDateChooser jdateChooser = window.robot().finder().findByName("expenseDateChooser",JDateChooser.class, false);
 			GuiActionRunner.execute(() -> {
 				Date localDateToDate = java.sql.Date.valueOf(date);
 				jdateChooser.setDate(localDateToDate);

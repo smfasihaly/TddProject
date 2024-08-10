@@ -24,6 +24,7 @@
 		<junit.version>4.13</junit.version>
 		<mockito.version>4.4.0</mockito.version>
 		<assertj.version>3.15.0</assertj.version>
+		<cucumber.version>5.5.0</cucumber.version>
 
 		<!-- Plugin Properties -->
 		<pitest-maven-version>1.5.2</pitest-maven-version>
@@ -35,6 +36,7 @@
 		<maven-compiler-plugin-version>3.8.0</maven-compiler-plugin-version>
 		<maven-clean-plugin-version>3.1.0</maven-clean-plugin-version>
 		<jacoco-maven-plugin-version>0.8.5</jacoco-maven-plugin-version>
+
 
 		<!-- Encoding and Compiler Properties -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -100,6 +102,18 @@
 			<version>4.0.2</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>io.cucumber</groupId>
+			<artifactId>cucumber-java</artifactId>
+			<version>${cucumber.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.cucumber</groupId>
+			<artifactId>cucumber-junit</artifactId>
+			<version>${cucumber.version}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -130,7 +144,22 @@
 						<configuration>
 							<sources>
 								<source>src/it/java</source>
+								<source>src/bdd/java</source>
 							</sources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>add-test-resource</id>
+						<phase>generate-test-resources</phase>
+						<goals>
+							<goal>add-test-resource</goal>
+						</goals>
+						<configuration>
+							<resources>
+								<resource>
+									<directory>src/bdd/resources</directory>
+								</resource>
+							</resources>
 						</configuration>
 					</execution>
 				</executions>
@@ -152,9 +181,9 @@
 						<version>${jacoco-maven-plugin-version}</version>
 						<configuration>
 							<excludes>
-								<exclude>**/App.*</exclude>
+								<exclude>**/app/*.*</exclude>
 								<exclude>**/model/*.*</exclude>
-
+								
 							</excludes>
 						</configuration>
 						<executions>
@@ -250,6 +279,7 @@
 									com.tdd.expensetracker.model.**</param>
 								<param>
 									com.tdd.expensetracker.app.**</param>
+									
 							</excludedClasses>
 							<excludedTestClasses>
 								<param>
@@ -323,13 +353,29 @@
 						<artifactId>maven-failsafe-plugin</artifactId>
 						<version>${maven-surefire-plugin-version}</version>
 						<executions>
-							<execution>
+						<execution>
+								<id>default-it</id>
 								<goals>
 									<goal>integration-test</goal>
 									<goal>verify</goal>
 								</goals>
 								<configuration>
 									<testSourceDirectory>src/it/java</testSourceDirectory>
+								</configuration>
+							</execution>
+							<execution>
+								<id>bdd-tests</id>
+								<goals>
+									<goal>integration-test</goal>
+									<goal>verify</goal>
+								</goals>
+								<configuration>
+									<excludes>
+										<exclude>**/*IT.java</exclude>
+									</excludes>
+									<includes>
+										<include>**/*BDD.java</include>
+									</includes>
 								</configuration>
 							</execution>
 						</executions>
