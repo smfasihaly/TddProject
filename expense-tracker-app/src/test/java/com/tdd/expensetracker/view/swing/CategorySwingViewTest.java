@@ -199,7 +199,7 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Cancel")).click();
 
 		JTextField idTextBox = window.robot().finder().findByName("idTextBox", JTextField.class, false);
-		assertThat("").isEqualTo(idTextBox.getText());
+		assertThat(idTextBox.getText()).isBlank();
 		window.textBox("nameTextBox").requireText("");
 		window.textBox("descriptionTextBox").requireText("");
 		window.button(JButtonMatcher.withText("Add Category")).requireDisabled();
@@ -284,7 +284,7 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 		categorySwingView.categoryAdded(category);
 		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> window.textBox("descriptionTextBox").requireText(""));
 		JTextField idTextBox = window.robot().finder().findByName("idTextBox", JTextField.class, false);
-		assertThat("").isEqualTo(idTextBox.getText());
+		assertThat(idTextBox.getText()).isBlank();
 		window.textBox("nameTextBox").requireText("");
 		window.button(JButtonMatcher.withText("Add Category")).requireDisabled();
 	}
@@ -334,7 +334,7 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 		categorySwingView.categoryUpdated(updatedCategory);
 
 		JTextField idTextBox = window.robot().finder().findByName("idTextBox", JTextField.class, false);
-		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> assertThat("").isEqualTo(idTextBox.getText()));
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> assertThat(idTextBox.getText()).isBlank());
 		window.textBox("nameTextBox").requireText("");
 		window.textBox("descriptionTextBox").requireText("");
 		window.button(JButtonMatcher.withText("Add Category")).requireDisabled();

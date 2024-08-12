@@ -135,7 +135,7 @@ public class ExpenseSwingViewIT extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Add Expense")).click();
 
 		await().atMost(5, TimeUnit.SECONDS)
-				.untilAsserted(() -> assertThat(window.label("errorMessageLabel").text().trim()).isNotEmpty());
+				.untilAsserted(() -> assertThat(window.label("errorMessageLabel").text().trim()).isNotBlank());
 
 		assertThat(window.list().contents()).isEmpty();
 		window.label("errorMessageLabel").requireText("Date cannot be in the future: "
@@ -164,7 +164,7 @@ public class ExpenseSwingViewIT extends AssertJSwingJUnitTestCase {
 		window.list().selectItem(0);
 		window.button(JButtonMatcher.withText("Delete Selected")).click();
 		await().atMost(5, TimeUnit.SECONDS)
-				.untilAsserted(() -> assertThat(window.label("errorMessageLabel").text().trim()).isNotEmpty());
+				.untilAsserted(() -> assertThat(window.label("errorMessageLabel").text().trim()).isNotBlank());
 
 		assertThat(window.list().contents()).isEmpty();
 		window.label("errorMessageLabel").requireText("Expense does not exist with id 1: " + expense);
@@ -204,7 +204,7 @@ public class ExpenseSwingViewIT extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Update Expense")).click();
 
 		await().atMost(5, TimeUnit.SECONDS)
-				.untilAsserted(() -> assertThat(window.label("errorMessageLabel").text().trim()).isNotEmpty());
+				.untilAsserted(() -> assertThat(window.label("errorMessageLabel").text().trim()).isNotBlank());
 
 		assertThat(window.list().contents()).containsExactly(getDisplayString(expense));
 
@@ -242,7 +242,6 @@ public class ExpenseSwingViewIT extends AssertJSwingJUnitTestCase {
 		}
 	}
 	private String getDisplayString(Expense expense) {
-		// TODO Auto-generated method stub
 		return expense.getId() + " | " + expense.getDescription() +  " | " + expense.getAmount() + " | " + expense.getDate() + " | " + expense.getCategory().getName()  ;
 	}
 

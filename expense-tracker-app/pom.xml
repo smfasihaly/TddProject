@@ -48,7 +48,7 @@
 
 		<!-- For each rule to be ignored, add another eXX and two corresponding
 		properties with eXX in the name as below -->
-		<sonar.issue.ignore.multicriteria>e11,e12,e13</sonar.issue.ignore.multicriteria>
+		<sonar.issue.ignore.multicriteria>e11,e12,e13,e14</sonar.issue.ignore.multicriteria>
 
 		<!-- Disable rule for "Inheritance tree of classes should not be too
 		deep" -->
@@ -76,6 +76,13 @@
 		<sonar.issue.ignore.multicriteria.e13.resourceKey>
 			**/*SwingViewTest.java
 		</sonar.issue.ignore.multicriteria.e13.resourceKey>
+		<!-- Disable rule for "Use static access with "javax.swing.WindowConstants" -->
+		<sonar.issue.ignore.multicriteria.e14.ruleKey>
+			java:S3252
+		</sonar.issue.ignore.multicriteria.e14.ruleKey>
+		<sonar.issue.ignore.multicriteria.e14.resourceKey>
+			**/*SwingView.java
+		</sonar.issue.ignore.multicriteria.e14.resourceKey>
 
 		<sonar.coverage.exclusions>
 			**/model/*.*,

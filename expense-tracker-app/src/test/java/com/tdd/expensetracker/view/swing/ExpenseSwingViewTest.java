@@ -295,7 +295,7 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Cancel")).click();
 
 		JTextField idTextBox = window.robot().finder().findByName("idTextBox", JTextField.class, false);
-		assertThat("").isEqualTo(idTextBox.getText());
+		assertThat(idTextBox.getText()).isBlank();
 		window.textBox("descriptionTextBox").requireText("");
 		window.textBox("amountTextBox").requireText("");
 		JDateChooser jdateChooser = window.robot().finder().findByName("expenseDateChooser",JDateChooser.class, false);
@@ -424,7 +424,7 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		expenseSwingView.expenseUpdated(updatedExpense);
 		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> window.textBox("descriptionTextBox").requireText(""));
 		JTextField idTextBox = window.robot().finder().findByName("idTextBox", JTextField.class, false);
-		assertThat("").isEqualTo(idTextBox.getText());
+		assertThat(idTextBox.getText()).isBlank();
 		window.textBox("amountTextBox").requireText("");
 		JDateChooser jdateChooser = window.robot().finder().findByName("expenseDateChooser",JDateChooser.class, false);
 		assertThat(jdateChooser.getDate()).isNull();
@@ -549,7 +549,6 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		});
 	}
 	private String getDisplayString(Expense expense) {
-		// TODO Auto-generated method stub
 		return expense.getId() + " | " + expense.getDescription() +  " | " + expense.getAmount() + " | " + expense.getDate() + " | " + expense.getCategory().getName()  ;
 	}
 }

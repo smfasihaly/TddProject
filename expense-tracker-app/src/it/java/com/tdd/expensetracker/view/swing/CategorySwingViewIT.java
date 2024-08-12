@@ -123,7 +123,7 @@ public class CategorySwingViewIT extends AssertJSwingJUnitTestCase {
 
 		window.button(JButtonMatcher.withText("Add Category")).click();
 		await().atMost(5, TimeUnit.SECONDS)
-		.untilAsserted(() -> assertThat(window.label("errorMessageLabel").text().trim()).isNotEmpty());
+		.untilAsserted(() -> assertThat(window.label("errorMessageLabel").text().trim()).isNotBlank());
 		assertThat(window.list().contents()).isEmpty();
 
 		window.label("errorMessageLabel").requireText("Already existing category with name " + category.getName() + ": "
@@ -153,7 +153,7 @@ public class CategorySwingViewIT extends AssertJSwingJUnitTestCase {
 		window.list().selectItem(0);
 		window.button(JButtonMatcher.withText("Delete Selected")).click();
 		await().atMost(5, TimeUnit.SECONDS)
-		.untilAsserted(() -> assertThat(window.label("errorMessageLabel").text().trim()).isNotEmpty());
+		.untilAsserted(() -> assertThat(window.label("errorMessageLabel").text().trim()).isNotBlank());
 
 		assertThat(window.list().contents()).isEmpty();
 		window.label("errorMessageLabel").requireText("Category does not exist with id 1: " + category);
@@ -201,7 +201,7 @@ public class CategorySwingViewIT extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Update Category")).click();
 		
 		await().atMost(5, TimeUnit.SECONDS)
-		.untilAsserted(() -> assertThat(window.label("errorMessageLabel").text().trim()).isNotEmpty());
+		.untilAsserted(() -> assertThat(window.label("errorMessageLabel").text().trim()).isNotBlank());
 
 
 
