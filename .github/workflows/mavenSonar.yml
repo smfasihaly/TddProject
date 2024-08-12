@@ -30,7 +30,7 @@ jobs:
     
     - name: Build with Maven and SonarCloud
       run: |
-        mvn verify -Pjacoco sonar:sonar \
+         xvfb-run mvn verify -Pjacoco sonar:sonar \
           -Dsonar.projectKey=smfasihaly_TddProject \
           -Dsonar.organization=smfasihaly \
           -Dsonar.host.url=https://sonarcloud.io \
