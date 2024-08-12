@@ -2,6 +2,8 @@ name: Java CI with Maven, Docker and SonarCloud in Linux
 
 on:
   push:
+    branches:
+     - master
   pull_request: 
 
 jobs:
@@ -30,7 +32,7 @@ jobs:
         xvfb-run mvn verify \
           -Dsonar.organization=smfasihaly \
           -Dsonar.host.url=https://sonarcloud.io \
-          -Dsonar.projectKey=smfasihaly_TddProject 
+          -Dsonar.projectKey=smfasihaly_TddProject  
       working-directory: expense-tracker-app
       env:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
