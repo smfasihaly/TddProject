@@ -54,7 +54,7 @@
 			squid:MaximumInheritanceDepth
 		</sonar.issue.ignore.multicriteria.e11.ruleKey>
 		<sonar.issue.ignore.multicriteria.e11.resourceKey>
-		**/*.java
+			**/*.java
 		</sonar.issue.ignore.multicriteria.e11.resourceKey>
 
 		<!-- Disable rule for "Local variable and method parameter names should
@@ -480,6 +480,57 @@
 								<goals>
 									<goal>stop</goal>
 								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>jacoco</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<version>${jacoco-maven-plugin-version}</version>
+						<configuration>
+							<excludes>
+								<exclude>**/app/*.*</exclude>
+								<exclude>**/model/*.*</exclude>
+								<exclude>**/bdd/*.*</exclude>
+
+							</excludes>
+						</configuration>
+						<executions>
+							<execution>
+								<goals>
+									<!-- binds by default to the phase
+									"initialize" -->
+									<goal>prepare-agent</goal>
+									<!-- binds by default to the phase "verify" -->
+									<goal>report</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>jacoco-check</id>
+								<goals>
+									<goal>check</goal>
+								</goals>
+								<configuration>
+									<rules>
+										<rule>
+											<element>PACKAGE</element>
+											<limits>
+												<limit>
+													<counter>LINE</counter>
+													<value>COVEREDRATIO</value>
+													<minimum>0.50</minimum>
+												</limit>
+											</limits>
+										</rule>
+									</rules>
+								</configuration>
 							</execution>
 						</executions>
 					</plugin>
