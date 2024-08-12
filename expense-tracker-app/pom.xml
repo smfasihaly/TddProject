@@ -11,8 +11,7 @@
 	<name>expense-tracker-app</name>
 
 	<properties>
-		<sonar.organization>smfasihaly</sonar.organization>
-		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
+		
 
 		<log4j-api-version>2.13.0</log4j-api-version>
 		<wait-log>ready for connections. Bind-address</wait-log>

@@ -189,7 +189,6 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 		dateChooser = new JDateChooser();
 		dateChooser.setName("expenseDateChooser");
 		dateChooser.setOpaque(false);
-		dateChooser.addPropertyChangeListener(e -> setEnableAddOrUpdateButton());
 		dateChooser.setDateFormatString(dateFormatString);
 		dateChooser.setSize(new Dimension(100, 50));
 
@@ -245,6 +244,7 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 		contentPane.add(cbxCategory, gbc_cbxCategory);
 
 		btnAddExpense = new JButton("Add Expense");
+		btnAddExpense.setName("addButton");
 		btnAddExpense.addActionListener(e -> new Thread(() -> {
 			LocalDate date = getSelectedDateAsLocalDate();
 
@@ -254,8 +254,7 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 			expenseController.newExpense(expense);
 		}).start());
 		btnAddExpense.setEnabled(false);
-		btnAddExpense.setName("addButton");
-		btnAddExpense.setName("btnAddExpense");
+		dateChooser.addPropertyChangeListener(e -> setEnableAddOrUpdateButton());
 		GridBagConstraints gbc_btnAddExpense = new GridBagConstraints();
 		gbc_btnAddExpense.insets = new Insets(0, 0, 5, 0);
 		gbc_btnAddExpense.gridwidth = 4;
