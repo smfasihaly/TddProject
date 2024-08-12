@@ -36,6 +36,9 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 
 	@Mock
 	private CategoryController categoryController;
+	
+	@Mock
+	private ExpenseSwingView expenseSwingView;
 
 	private AutoCloseable closeable;
 
@@ -47,6 +50,7 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 		GuiActionRunner.execute(() -> {
 			categorySwingView = new CategorySwingView();
 			categorySwingView.setCategoryController(categoryController);
+			categorySwingView.setExpenseView(expenseSwingView);
 			return categorySwingView;
 		});
 
@@ -223,6 +227,13 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 		assertThat(crossLabel.isVisible()).isFalse();
 		assertThat(totalLabel.isVisible()).isFalse();
 	}
+	
+	@Test
+	public void testOpenExpenseFormShouldOpenExpenseForm() {
+		window.button(JButtonMatcher.withText("Open Expense Form")).click();
+		verify(expenseSwingView).setVisible(true);
+
+	}
 
 	// View Interface
 	@Test
@@ -243,6 +254,15 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 		Category category = new Category("1", "bills", "utilities");
 
 		categorySwingView.showError("error message", category);
+		window.label("errorMessageLabel").requireText("error message: " + category);
+	}
+	
+	@Test
+	public void testShowErrorCategoryNotFoundShouldShowTheMessageInTheErrorLabel() {
+
+		Category category = new Category("1", "bills", "utilities");
+
+		categorySwingView.showErrorCategoryNotFound("error message", category);
 		window.label("errorMessageLabel").requireText("error message: " + category);
 	}
 
@@ -452,7 +472,9 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 		verify(categoryController).getAllExpenses(category);
 
 	}
-
+	
+	
+	
 	private void setFieldValues(String name, String description) {
 		window.textBox("nameTextBox").enterText(name);
 		window.textBox("descriptionTextBox").enterText(description);

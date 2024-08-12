@@ -10,10 +10,9 @@
 		private static final Logger LOGGER = LogManager.getLogger(ValidateUtils.class);
 	
 		private ValidateUtils() {
-			LOGGER.info("ValidateUtils class initialized");
 		}
 	
-		public static boolean validateRequiredString(String string, String fieldName) throws ValidationException {
+		public static boolean validateRequiredString(String string, String fieldName){
 			LOGGER.debug("Validating required string for field: {}", fieldName);
 	
 			if (string == null || string.trim().isEmpty()) {
@@ -25,7 +24,7 @@
 			return true;
 		}
 	
-		public static boolean validateAmount(Double amount) throws ValidationException {
+		public static boolean validateAmount(Double amount) {
 			LOGGER.debug("Validating amount: {}", amount);
 	
 			if (amount <= 0) {
@@ -37,7 +36,7 @@
 			return true;
 		}
 	
-		public static boolean validateDate(LocalDate date) throws ValidationException {
+		public static boolean validateDate(LocalDate date) {
 			LOGGER.debug("Validating date: {}", date);
 	
 			if (date == null) {

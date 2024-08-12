@@ -137,8 +137,19 @@ public class CategoryControllerTest {
 	}
 
 	@Test
-	public void testUpdateCategoryWhenExist() {
+	public void testUpdateCategoryDesctriptionWhenExist() {
 		Category updatedCategory = new Category("1", "name1","description1");
+		Category existingCategory = new Category("1", "name1","description2");
+		when(categoryRepository.findById("1")).thenReturn(existingCategory);
+		when(categoryRepository.findByName("name1")).thenReturn(existingCategory);
+		categoryController.updateCategory(updatedCategory);
+		InOrder inOrder = inOrder(categoryRepository, categoryView);
+		inOrder.verify(categoryRepository).update(updatedCategory);
+		inOrder.verify(categoryView).categoryUpdated(updatedCategory);
+	} 
+	@Test
+	public void testUpdateCategoryNameWhenExist() {
+		Category updatedCategory = new Category("1", "name1","description2");
 		Category existingCategory = new Category("1", "name2","description2");
 		when(categoryRepository.findById("1")).thenReturn(existingCategory);
 		when(categoryRepository.findByName("name2")).thenReturn(existingCategory);
@@ -146,8 +157,10 @@ public class CategoryControllerTest {
 		InOrder inOrder = inOrder(categoryRepository, categoryView);
 		inOrder.verify(categoryRepository).update(updatedCategory);
 		inOrder.verify(categoryView).categoryUpdated(updatedCategory);
-	}
-
+	} 
+	
+	
+	
 	@Test
 	public void testUpdateCategoryWhenDoesNotExist() {
 		Category updatedCategory = new Category("1", "name1","description1");
@@ -183,6 +196,8 @@ public class CategoryControllerTest {
 		verifyNoMoreInteractions(ignoreStubs(categoryRepository));
 
 	}
+	
+	
 	
 	@Test
 	public void testUpdateCategoryWhenDescriptionIsEmpty() {

@@ -71,7 +71,7 @@ public class CategoryController {
 			return;
 		}
 
-		if (categoryToDelete.getExpenses().size() > 0) {
+		if (!categoryToDelete.getExpenses().isEmpty()) {
 			LOGGER.warn("Category with id {} cannot be deleted because it has associated expenses",
 					categoryToDelete.getId());
 			categoryView.showError("Category cannot be deleted. Expenses are associated with it", categoryToDelete);
@@ -118,7 +118,7 @@ public class CategoryController {
 		LOGGER.info("Getting all expenses for category: {}", category);
 
 		List<Expense> expenses = category.getExpenses();
-		if (expenses.size() == 0) {
+		if (expenses.isEmpty()) {
 			LOGGER.warn("No expenses found for category: {}", category);
 			categoryView.showError("No Expense created for this category", category);
 			return;

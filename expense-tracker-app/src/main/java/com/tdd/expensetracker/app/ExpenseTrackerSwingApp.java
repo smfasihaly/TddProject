@@ -5,6 +5,8 @@ import java.awt.EventQueue;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
@@ -22,13 +24,13 @@ import com.tdd.expensetracker.view.swing.ExpenseSwingView;
  *
  */
 public class ExpenseTrackerSwingApp {
-
+	private static final Logger LOGGER = LogManager.getLogger(ExpenseTrackerSwingApp.class);
 	public static void main(String[] args) {
 		try {
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-				| UnsupportedLookAndFeelException e1) {
-			 			e1.printStackTrace();
+				| UnsupportedLookAndFeelException e) {
+			 LOGGER.error("context", e);
 		}
 		EventQueue.invokeLater(() -> {
 			try {
@@ -57,10 +59,9 @@ public class ExpenseTrackerSwingApp {
 				categoryView.setCategoryController(categoryController);
 				categoryController.allCategory();
 				categoryView.setExpenseView(expenseView);
-				//categoryView.setVisible(false);
 
 			} catch (Exception e) {
-				e.printStackTrace();
+				 LOGGER.error("context", e);
 			}
 		});
 	}

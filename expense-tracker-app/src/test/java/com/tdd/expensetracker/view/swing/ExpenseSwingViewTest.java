@@ -39,6 +39,8 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 
 	@Mock
 	private ExpenseController expenseController;
+	@Mock
+	private CategorySwingView categorySwingView;
 
 	private AutoCloseable closeable;
 
@@ -51,6 +53,7 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		GuiActionRunner.execute(() -> {
 			expenseSwingView = new ExpenseSwingView();
 			expenseSwingView.setExpenseController(expenseController);
+			expenseSwingView.setCategoryView(categorySwingView);
 
 			expenseSwingView.getComboCategoriesModel().addElement(existingCategory);
 			expenseSwingView.getComboCategoriesModel().addElement(new Category("2", "Bills", "Utilities"));
@@ -168,8 +171,6 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		amountTxtBox.requireText("1245");
 	}
 
-	
-
 	@Test
 	public void testDeleteSelectedAndUpdateSelectedButtonShouldBeEnabledOnlyWhenAExpenseIsSelected() {
 
@@ -210,7 +211,6 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 
 	}
 	
-	
 	@Test
 	public void testWhenAnyRequiredFieldsAreBlankThenUpdateButtonShouldBeDisabled() {
 
@@ -246,7 +246,6 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Add Expense")).requireDisabled();
 
 	}
-
 
 	@Test
 	public void testUpdateExpenseAndCancelButtonShouldBeVisibleAndAddExpenseButtonShouldBeHiddenWhenUpdateSeletedButtonIsClicked() {
@@ -286,10 +285,6 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Update Expense")).requireDisabled();
 	}
 
-	
-
-	
-
 	@Test
 	public void testFormResetAfterCancelingUpdate() {
 		Expense expense = new Expense("1", 5000d, "testExpense", LocalDate.now(), existingCategory);
@@ -311,7 +306,14 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Cancel")).requireNotVisible();
 
 	}
+	
+	@Test
+	public void testOpenCategoryFormShouldOpenExpenseForm() {
+		window.button(JButtonMatcher.withText("Open Category Form")).click();
+		verify(categorySwingView).setVisible(true);
 
+	}
+	
 	// View Interface
 	@Test
 	public void testsShowAllExpensesShouldAddExpenseDescriptionsToTheListUpdateTotal() {
@@ -334,6 +336,15 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		expenseSwingView.showError("error message", expense);
 		window.label("errorMessageLabel").requireText("error message: " + expense);
 	}
+	@Test
+	public void testShowErrorExpenseNotFoundShouldShowTheMessageInTheErrorLabel() {
+
+		Expense expense = new Expense("1", 5000d, "testExpense", LocalDate.now(), existingCategory);
+
+		expenseSwingView.showErrorExpenseNotFound("error message", expense);
+		window.label("errorMessageLabel").requireText("error message: " + expense);
+	}
+
 
 	@Test
 	public void testExpenseAddedShouldAddTheExpenseToTheListAndResetTheErrorLabelAndUpdateTotal() {
@@ -504,7 +515,6 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		await().atMost(5, TimeUnit.SECONDS)
 				.untilAsserted(() -> verify(expenseController).updateExpense(updatedExpense));
 	}
-	
 	
 
 	private void setFieldValues(String description, String amount, LocalDate date, Category category) {
