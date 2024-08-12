@@ -36,7 +36,7 @@
 		<maven-surefire-plugin-version>2.22.1</maven-surefire-plugin-version>
 		<maven-compiler-plugin-version>3.8.0</maven-compiler-plugin-version>
 		<maven-clean-plugin-version>3.1.0</maven-clean-plugin-version>
-		<jacoco-maven-plugin-version>>0.8.10</jacoco-maven-plugin-version>
+		<jacoco-maven-plugin-version>0.8.10</jacoco-maven-plugin-version>
 
 
 		<!-- Encoding and Compiler Properties -->
