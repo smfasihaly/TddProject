@@ -19,7 +19,7 @@ jobs:
     - name: Cache Maven packages
       uses: actions/cache@v2
       with:
-        path: |
+        path: | 
           ~/.m2
           ~/.sonar/cache
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml', '**/*.yml') }}
@@ -32,4 +32,4 @@ jobs:
           -Dsonar.login=${{ secrets.SONAR_TOKEN }}
       working-directory: expense-tracker-app
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
