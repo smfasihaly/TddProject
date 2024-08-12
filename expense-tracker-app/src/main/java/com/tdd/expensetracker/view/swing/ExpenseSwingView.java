@@ -255,6 +255,7 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 		}).start());
 		btnAddExpense.setEnabled(false);
 		btnAddExpense.setName("addButton");
+		btnAddExpense.setName("btnAddExpense");
 		GridBagConstraints gbc_btnAddExpense = new GridBagConstraints();
 		gbc_btnAddExpense.insets = new Insets(0, 0, 5, 0);
 		gbc_btnAddExpense.gridwidth = 4;
