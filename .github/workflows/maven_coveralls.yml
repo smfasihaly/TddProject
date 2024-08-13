@@ -1,0 +1,43 @@
+name: Java CI with Maven
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      # test against several Java versions:
+      matrix:
+        include:
+          - java: 8
+            additional-maven-args: >
+              -Pjacoco
+              -DrepoToken=$COVERALLS_REPO_TOKEN
+          - java: 11
+          
+    name: Build with Java ${{ matrix.java }} on Linux 
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set up JDK ${{ matrix.java }}
+      uses: actions/setup-java@v1
+      with:
+        java-version: ${{ matrix.java }}
+        distribution: 'temurin'       
+    
+    - name: Cache Maven packages
+      uses: actions/cache@v2
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml', '**/*.yml') }}
+        restore-keys: ${{ runner.os }}-m2-
+    
+    - name: Run Unit Tests with Jacoco and PIT
+      run: xvfb-run mvn verify ${{ matrix.additional-maven-args }}
+      working-directory: expense-tracker-app
+      env: 
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
+
+          
