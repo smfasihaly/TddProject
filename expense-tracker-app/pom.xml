@@ -11,7 +11,8 @@
 	<name>expense-tracker-app</name>
 
 	<properties>
-		
+		<coveralls-maven-plugin-version>4.3.0</coveralls-maven-plugin-version>
+
 
 		<log4j-api-version>2.13.0</log4j-api-version>
 		<wait-log>ready for connections. Bind-address</wait-log>
@@ -62,7 +63,7 @@
 		<!-- Disable rule for "Local variable and method parameter names should
 		comply with a naming convention" -->
 		<sonar.issue.ignore.multicriteria.e12.ruleKey>
-			squid:S00117
+			java:S117
 		</sonar.issue.ignore.multicriteria.e12.ruleKey>
 		<sonar.issue.ignore.multicriteria.e12.resourceKey>
 			**/*SwingView.java
@@ -71,12 +72,13 @@
 		<!-- Disable rule for "Tests should include assertions": SonarQube is
 		not aware of AssertJ Swing -->
 		<sonar.issue.ignore.multicriteria.e13.ruleKey>
-			squid:S2699
+			java:S2699
 		</sonar.issue.ignore.multicriteria.e13.ruleKey>
 		<sonar.issue.ignore.multicriteria.e13.resourceKey>
 			**/*SwingViewTest.java
 		</sonar.issue.ignore.multicriteria.e13.resourceKey>
-		<!-- Disable rule for "Use static access with "javax.swing.WindowConstants" -->
+		<!-- Disable rule for "Use static access with
+		"javax.swing.WindowConstants" -->
 		<sonar.issue.ignore.multicriteria.e14.ruleKey>
 			java:S3252
 		</sonar.issue.ignore.multicriteria.e14.ruleKey>
@@ -237,6 +239,29 @@
 			<id>unit-test</id>
 			<build>
 				<plugins>
+					<plugin>
+						<groupId>org.eluder.coveralls</groupId>
+						<artifactId>coveralls-maven-plugin</artifactId>
+						<version>${coveralls-maven-plugin-version}</version>
+						<dependencies>
+							<!-- This is required when using JDK 9 or higher
+								since javax.xml.bind has been removed from the JDK -->
+							<dependency>
+								<groupId>javax.xml.bind</groupId>
+								<artifactId>jaxb-api</artifactId>
+								<version>2.3.1</version>
+							</dependency>
+						</dependencies>
+						<executions>
+							<execution>
+								<phase>verify</phase>
+								<goals>
+									<goal>report</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					
 					<plugin>
 						<artifactId>maven-surefire-plugin</artifactId>
 						<version>${maven-surefire-plugin-version}</version>
