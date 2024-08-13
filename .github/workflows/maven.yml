@@ -28,6 +28,11 @@ jobs:
       run: xvfb-run mvn verify -Punit-test
       working-directory: expense-tracker-app
     
+    - name: Run Coveralls Report
+      run: xvfb-run mvn coveralls:report -Pcoveralls -DrepoToken=$COVERALLS_REPO_TOKEN
+      working-directory: expense-tracker-app
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
     - name: Archive Unit Test Reports and Site
       uses: actions/upload-artifact@v2
       if: ${{ always() }}
