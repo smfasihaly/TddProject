@@ -29,7 +29,7 @@ jobs:
       working-directory: expense-tracker-app
     
     - name: Run Coveralls Report
-      run: xvfb-run mvn coveralls:report -Pcoveralls -DrepoToken=$COVERALLS_REPO_TOKEN
+      run: xvfb-run mvn coveralls:report -Pcoveralls -DrepoToken=$COVERALLS_REPO_TOKEN -DpullRequest=${{ github.event.pull_request.number }}
       working-directory: expense-tracker-app
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
