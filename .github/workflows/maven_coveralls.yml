@@ -12,10 +12,8 @@ jobs:
       matrix:
         include:
           - java: 8
-            additional-maven-args: >
-              -Pjacoco
-              -DrepoToken=$COVERALLS_REPO_TOKEN
-          - java: 11
+            additional-maven-args: "-Pcoveralls -DrepoToken=$COVERALLS_REPO_TOKEN coveralls:report"
+
           
     name: Build with Java ${{ matrix.java }} on Linux 
     steps:
@@ -27,29 +25,19 @@ jobs:
         java-version: ${{ matrix.java }}
         distribution: 'temurin'       
     
-    - name: Cache Maven packages
+    - name: Cache Maven package
       uses: actions/cache@v2
       with:
         path: ~/.m2
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml', '**/*.yml') }}
         restore-keys: ${{ runner.os }}-m2-
     
-    - name: Run Unit Tests with Jacoco and PIT
-      run:  xvfb-run mvn verify ${{ matrix.additional-maven-args }}
+    - name: Run coversall
+      run:  xvfb-run mvn verify ${{matrix.additional-maven-args}}
       working-directory: expense-tracker-app
       env: 
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
     
-    - name: Generate JUnit Report
-      run: >
-        mvn surefire-report:report-only site:site -DgenerateReports=false
-      working-directory: expense-tracker-app
-      if: ${{ always() }}
-    - name: Archive JUnit Report
-      uses: actions/upload-artifact@v2
-      if: ${{ always() }}
-      with:
-        name: surefire-report-jdk-${{ matrix.java }}
-        path: expense-tracker-app/target/site/*
+
 
           
