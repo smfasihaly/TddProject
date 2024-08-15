@@ -1,0 +1,48 @@
+name: Java CI with Maven - Unit and Integration Testing with Coverage on Windows and macOS
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest]
+        java-version: [1.8, 11]
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set up JDK ${{ matrix.java-version }}
+      uses: actions/setup-java@v1
+      with:
+        java-version: ${{ matrix.java-version }}
+    
+    - name: Cache Maven packages
+      uses: actions/cache@v2
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ matrix.java-version }}-${{ hashFiles('**/pom.xml', '**/*.yml') }}
+        restore-keys: ${{ runner.os }}-m2-
+
+    - name: Run Unit Tests
+      run: mvn verify -Punit-test
+      working-directory: expense-tracker-app
+
+    - name: Run Integration Tests
+      run: mvn verify -Pintegration-test
+      working-directory: expense-tracker-app
+    
+    - name: Archive Test Reports
+      uses: actions/upload-artifact@v2
+      if: ${{ always() }}
+      with:
+        name: test-reports-${{ matrix.os }}-jdk-${{ matrix.java-version }}
+        path: |
+          expense-tracker-app/target/surefire-reports/*
+          expense-tracker-app/target/failsafe-reports/*
+          expense-tracker-app/target/site/jacoco/*
+          expense-tracker-app/target/pit-reports/*
+          expense-tracker-app/target/site/*

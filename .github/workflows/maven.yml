@@ -1,4 +1,4 @@
-name: Java CI with Maven
+name: Java CI with Maven - Multi-Version Unit and Integration Testing with Coverage
 
 on:
   push:
@@ -7,62 +7,77 @@ on:
 jobs:
   unit-tests:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - java: 1.8
+            additional-maven-args: "-Punit-test -Pmutation-testing-with-coverage -DrepoToken=$COVERALLS_REPO_TOKEN coveralls:report"
+          - java: 11
+            additional-maven-args: "-Punit-test"
+    
+    name: Unit Tests on Java ${{ matrix.java }}
     
     steps:
     - name: Check out repository
       uses: actions/checkout@v2
     
-    - name: Set up JDK 1.8
+    - name: Set up JDK ${{ matrix.java }}
       uses: actions/setup-java@v1
       with:
-        java-version: 1.8        
+        java-version: ${{ matrix.java }}
     
     - name: Cache Maven packages
       uses: actions/cache@v2
       with:
         path: ~/.m2
-        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml', '**/*.yml') }}
+        key: ${{ runner.os }}-m2-${{ matrix.java }}-${{ hashFiles('**/pom.xml', '**/*.yml') }}
         restore-keys: ${{ runner.os }}-m2-
     
-    - name: Run Unit Tests with Jacoco and PIT
-      run: xvfb-run mvn verify -Punit-test
-      working-directory: expense-tracker-app
-    
-    - name: Run Coveralls Report
-      run: xvfb-run mvn coveralls:report -Pcoveralls -DrepoToken=$COVERALLS_REPO_TOKEN -DpullRequest=${{ github.event.pull_request.number }}
+    - name: Run Unit Tests with Jacoco and PIT on Java ${{ matrix.java }}
+      run: xvfb-run mvn verify ${{ matrix.additional-maven-args }}
       working-directory: expense-tracker-app
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
+        
     - name: Archive Unit Test Reports and Site
       uses: actions/upload-artifact@v2
       if: ${{ always() }}
       with:
-        name: unit-test-reports
+        name: unit-test-reports-jdk-${{ matrix.java }}
         path: |
           expense-tracker-app/target/surefire-reports/*
           expense-tracker-app/target/site/jacoco/*
           expense-tracker-app/target/pit-reports/*
           expense-tracker-app/target/site/*
-          
-          
+
   integration-tests:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - java: 1.8
+          - java: 17
+    
     needs: unit-tests
+    
+    name: Integration Tests on Java ${{ matrix.java }}
     
     steps:
     - uses: actions/checkout@v2
-    - name: Set up JDK 1.8
+    
+    - name: Set up JDK ${{ matrix.java }}
       uses: actions/setup-java@v1
       with:
-        java-version: 1.8        
+        java-version: ${{ matrix.java }}
+        
     - name: Cache Maven packages
       uses: actions/cache@v2
       with:
         path: ~/.m2
-        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml', '**/*.yml') }}
+        key: ${{ runner.os }}-m2-${{ matrix.java }}-${{ hashFiles('**/pom.xml', '**/*.yml') }}
         restore-keys: ${{ runner.os }}-m2-
     
-    - name: Run Integration Tests
+    - name: Run Integration Tests on Java ${{ matrix.java }}
       run: xvfb-run mvn verify -Pintegration-test
       working-directory: expense-tracker-app
     
@@ -70,8 +85,7 @@ jobs:
       uses: actions/upload-artifact@v2
       if: ${{ always() }}
       with:
-        name: integration-test-reports
+        name: integration-test-reports-jdk-${{ matrix.java }}
         path: |
           expense-tracker-app/target/failsafe-reports/*
           expense-tracker-app/target/site/*
-
