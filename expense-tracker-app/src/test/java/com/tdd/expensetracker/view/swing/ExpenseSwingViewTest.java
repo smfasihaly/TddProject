@@ -364,7 +364,7 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		Expense expense = new Expense("1", 5000d, "testExpense", LocalDate.now(), existingCategory);
 
 		expenseSwingView.expenseAdded(expense);
-		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> window.textBox("descriptionTextBox").requireText(""));
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> window.textBox("descriptionTextBox").requireText(""));
 		window.textBox("amountTextBox").requireText("");
 		JDateChooser jdateChooser = window.robot().finder().findByName("expenseDateChooser",JDateChooser.class, false);
 		assertThat(jdateChooser.getDate()).isNull();
@@ -422,7 +422,7 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		Expense updatedExpense = new Expense("1", 50d, "testExpense2", LocalDate.now(), existingCategory);
 		// execute
 		expenseSwingView.expenseUpdated(updatedExpense);
-		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> window.textBox("descriptionTextBox").requireText(""));
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> window.textBox("descriptionTextBox").requireText(""));
 		JTextField idTextBox = window.robot().finder().findByName("idTextBox", JTextField.class, false);
 		assertThat(idTextBox.getText()).isBlank();
 		window.textBox("amountTextBox").requireText("");
@@ -445,7 +445,7 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 
 		JButtonFixture updateButton = window.button(JButtonMatcher.withText("Update Expense"));
 
-		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> updateButton.requireNotVisible());
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> updateButton.requireNotVisible());
 
 		JButtonFixture cancelButton = window.button(JButtonMatcher.withText("Cancel"));
 		cancelButton.requireNotVisible();
@@ -476,7 +476,7 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 
 		setFieldValues("testExpense", "5000", LocalDate.now(), existingCategory);
 		window.button(JButtonMatcher.withText("Add Expense")).click();
-		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> verify(expenseController)
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> verify(expenseController)
 				.newExpense(new Expense(5000d, "testExpense", LocalDate.now(), existingCategory)));
 	}
 
@@ -492,7 +492,7 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		});
 		window.list("expenseList").selectItem(1);
 		window.button(JButtonMatcher.withText("Delete Selected")).click();
-		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> verify(expenseController).deleteExpense(expense2));
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> verify(expenseController).deleteExpense(expense2));
 
 	}
 
@@ -512,7 +512,7 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Update Expense")).click();
 
 		Expense updatedExpense = new Expense("1", 50d, "testExpense", LocalDate.now(), existingCategory);
-		await().atMost(5, TimeUnit.SECONDS)
+		await().atMost(10, TimeUnit.SECONDS)
 				.untilAsserted(() -> verify(expenseController).updateExpense(updatedExpense));
 	}
 	

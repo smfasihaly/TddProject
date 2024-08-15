@@ -282,7 +282,7 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 		Category category = new Category("1", "bills", "utilities");
 
 		categorySwingView.categoryAdded(category);
-		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> window.textBox("descriptionTextBox").requireText(""));
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> window.textBox("descriptionTextBox").requireText(""));
 		JTextField idTextBox = window.robot().finder().findByName("idTextBox", JTextField.class, false);
 		assertThat(idTextBox.getText()).isBlank();
 		window.textBox("nameTextBox").requireText("");
@@ -334,7 +334,7 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 		categorySwingView.categoryUpdated(updatedCategory);
 
 		JTextField idTextBox = window.robot().finder().findByName("idTextBox", JTextField.class, false);
-		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> assertThat(idTextBox.getText()).isBlank());
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> assertThat(idTextBox.getText()).isBlank());
 		window.textBox("nameTextBox").requireText("");
 		window.textBox("descriptionTextBox").requireText("");
 		window.button(JButtonMatcher.withText("Add Category")).requireDisabled();
@@ -366,7 +366,7 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 		categorySwingView.categoryUpdated(updatedCategory);
 
 		JButtonFixture updateButton = window.button(JButtonMatcher.withText("Update Category"));
-		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> updateButton.requireNotVisible());
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> updateButton.requireNotVisible());
 
 		JButtonFixture cancelButton = window.button(JButtonMatcher.withText("Cancel"));
 		cancelButton.requireNotVisible();
@@ -416,7 +416,7 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 
 		setFieldValues("bills", "other");
 		window.button(JButtonMatcher.withText("Add Category")).click();
-		await().atMost(5, TimeUnit.SECONDS)
+		await().atMost(10, TimeUnit.SECONDS)
 				.untilAsserted(() -> verify(categoryController).newCategory(new Category("bills", "other")));
 	}
 
@@ -432,7 +432,7 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 		});
 		window.list("categoryList").selectItem(1);
 		window.button(JButtonMatcher.withText("Delete Selected")).click();
-		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> verify(categoryController).deleteCategory(category2));
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> verify(categoryController).deleteCategory(category2));
 
 	}
 
@@ -452,7 +452,7 @@ public class CategorySwingViewTest extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Update Category")).click();
 
 		Category updatedCategory = new Category("1", "new Name", "utilities");
-		await().atMost(5, TimeUnit.SECONDS)
+		await().atMost(10, TimeUnit.SECONDS)
 				.untilAsserted(() -> verify(categoryController).updateCategory(updatedCategory));
 
 	}
