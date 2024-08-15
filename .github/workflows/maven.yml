@@ -1,4 +1,4 @@
-name: Java CI with Maven - Multi-Version Unit and Integration Testing with Coverage
+name: Java CI with Maven - Multi-Version Unit, Integration Testing and E2E with Coverage
 
 on:
   push:
