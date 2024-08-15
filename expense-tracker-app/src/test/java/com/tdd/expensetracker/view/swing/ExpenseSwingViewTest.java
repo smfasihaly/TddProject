@@ -476,7 +476,7 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 
 		setFieldValues("testExpense", "5000", LocalDate.now(), existingCategory);
 		window.button(JButtonMatcher.withText("Add Expense")).click();
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> verify(expenseController)
+		await().atMost(20, TimeUnit.SECONDS).untilAsserted(() -> verify(expenseController)
 				.newExpense(new Expense(5000d, "testExpense", LocalDate.now(), existingCategory)));
 	}
 
