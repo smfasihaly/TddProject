@@ -11,6 +11,9 @@ jobs:
       matrix:
         os: [macos-latest, windows-latest]
         java-version: [1.8, 11]
+        exclude:
+          - os: macos-latest
+            java-version: 11
 
     steps:
     - uses: actions/checkout@v2
