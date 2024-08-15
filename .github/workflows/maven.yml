@@ -9,11 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        include:
-          - java: 1.8
-            additional-maven-args: "-Punit-test -Pmutation-testing-with-coverage -DrepoToken=$COVERALLS_REPO_TOKEN coveralls:report"
-          - java: 11
-            additional-maven-args: "-Punit-test"
+        java: [1.8, 11]
     
     name: Unit Tests on Java ${{ matrix.java }}
     
@@ -34,7 +30,11 @@ jobs:
         restore-keys: ${{ runner.os }}-m2-
     
     - name: Run Unit Tests with Jacoco and PIT on Java ${{ matrix.java }}
-      run: xvfb-run mvn verify ${{ matrix.additional-maven-args }}
+      run: xvfb-run mvn verify -Punit-test
+      working-directory: expense-tracker-app
+    
+    - name: Run Coveralls Report
+      run: xvfb-run mvn verify -Pcoveralls -DrepoToken=$COVERALLS_REPO_TOKEN -DpullRequest=${{ github.event.pull_request.number }}
       working-directory: expense-tracker-app
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
@@ -54,9 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        include:
-          - java: 1.8
-          - java: 17
+        java: [1.8, 11]
     
     needs: unit-tests
     

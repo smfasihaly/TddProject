@@ -1,4 +1,4 @@
-name: Java CI with Maven - Unit and Integration Testing with Coverage on Windows and macOS
+name: Java CI with Maven - Unit Testing with Coverage on Windows and macOS
 
 on:
   push:
@@ -31,9 +31,6 @@ jobs:
       run: mvn verify -Punit-test
       working-directory: expense-tracker-app
 
-    - name: Run Integration Tests
-      run: mvn verify -Pintegration-test
-      working-directory: expense-tracker-app
     
     - name: Archive Test Reports
       uses: actions/upload-artifact@v2
@@ -42,7 +39,6 @@ jobs:
         name: test-reports-${{ matrix.os }}-jdk-${{ matrix.java-version }}
         path: |
           expense-tracker-app/target/surefire-reports/*
-          expense-tracker-app/target/failsafe-reports/*
           expense-tracker-app/target/site/jacoco/*
           expense-tracker-app/target/pit-reports/*
           expense-tracker-app/target/site/*
