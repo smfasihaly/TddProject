@@ -43,6 +43,7 @@ public class ExpenseTrackerSwingAppSteps {
 
 	@When("The Expense View is shown")
 	public void the_Expense_View_is_shown() {
+	
 		// Launch the ExpenseTrackerSwingApp and wait for the UI to become idle
 		application("com.tdd.expensetracker.app.ExpenseTrackerSwingApp").start();
 		robot.waitForIdle();

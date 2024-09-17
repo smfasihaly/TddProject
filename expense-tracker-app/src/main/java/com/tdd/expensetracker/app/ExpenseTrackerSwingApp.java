@@ -25,17 +25,31 @@ import com.tdd.expensetracker.view.swing.ExpenseSwingView;
  */
 public class ExpenseTrackerSwingApp {
 	private static final Logger LOGGER = LogManager.getLogger(ExpenseTrackerSwingApp.class);
+	private static StandardServiceRegistry registry;
+
 	public static void main(String[] args) {
 		try {
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
 				| UnsupportedLookAndFeelException e) {
-			 LOGGER.error("context", e);
+			LOGGER.error("context", e);
 		}
 		EventQueue.invokeLater(() -> {
 			try {
-
-				StandardServiceRegistry registry = new StandardServiceRegistryBuilder().configure().build();
+				 String environment = System.getProperty("ENVIRONMENT"); // Defaults to "prod"
+			    
+				if ("testWithEclipes".equals(environment)) {
+					String url = System.getProperty("DB_URL");
+					String user = System.getProperty("DB_USER");
+					String pass = System.getProperty("DB_PASS");
+					registry = new StandardServiceRegistryBuilder().configure("hibernate-IT.cfg.xml")
+							.applySetting("hibernate.connection.url", url)
+							.applySetting("hibernate.connection.username", user)
+							.applySetting("hibernate.hbm2ddl.auto", "validate")
+							.applySetting("hibernate.connection.password", pass).build();
+				} else {
+					registry = new StandardServiceRegistryBuilder().configure().build();
+				}
 				MetadataSources metadataSources = new MetadataSources(registry);
 
 				SessionFactory sessionFactory = metadataSources.buildMetadata().buildSessionFactory();
@@ -61,7 +75,7 @@ public class ExpenseTrackerSwingApp {
 				categoryView.setExpenseView(expenseView);
 
 			} catch (Exception e) {
-				 LOGGER.error("context", e);
+				LOGGER.error("context", e);
 			}
 		});
 	}

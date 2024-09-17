@@ -43,4 +43,3 @@ Feature: Category View High Level
     And The user clicks the "Update Category" button
     Then An error is shown containing the name of the existing category
     
-    

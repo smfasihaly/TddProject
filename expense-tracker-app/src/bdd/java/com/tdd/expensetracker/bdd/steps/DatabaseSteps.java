@@ -9,12 +9,17 @@ import org.hibernate.Transaction;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.mockito.MockitoAnnotations;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.utility.DockerImageName;
 
 import com.tdd.expensetracker.model.Category;
 import com.tdd.expensetracker.model.Expense;
 
 import io.cucumber.java.After;
+import io.cucumber.java.AfterAll;
 import io.cucumber.java.Before;
+import io.cucumber.java.BeforeAll;
 import io.cucumber.java.en.Given;
 
 public class DatabaseSteps {
@@ -36,27 +41,60 @@ public class DatabaseSteps {
 	// Variables to hold references to first created expense and category
 	private Expense firstExpense;
 	private Category firstCategory;
+	  // Testcontainers MySQL container
+    public static final MySQLContainer<?>  mysqlContainer = new MySQLContainer<>(DockerImageName.parse("mysql:8.0.28"))
+            .withDatabaseName("test")
+            .withUsername("test")
+            .withPassword("test");
+    
+	@BeforeAll
+	public static void configureDB() {
+		if (isRunningInEclipse()) {
+				 
 
-	@Before
-	public void setup() {
-		// Setting up Hibernate session factory with configuration specific to integration testing
-		registry = new StandardServiceRegistryBuilder().configure("hibernate-IT.cfg.xml")
-				.applySetting("hibernate.connection.url", "jdbc:mysql://localhost:3307/expense_tracker")
-				.applySetting("hibernate.connection.password", "test").build();
+              mysqlContainer.start();
+              System.setProperty("DB_URL", mysqlContainer.getJdbcUrl());
+              System.setProperty("DB_USER", mysqlContainer.getUsername());
+              System.setProperty("DB_PASS", mysqlContainer.getPassword());
+    		  System.setProperty("ENVIRONMENT", "testWithEclipes");
+              registry = new StandardServiceRegistryBuilder().configure("hibernate-IT.cfg.xml")
+                      .applySetting("hibernate.connection.url", mysqlContainer.getJdbcUrl())
+                      .applySetting("hibernate.connection.username", mysqlContainer.getUsername())
+                      .applySetting("hibernate.connection.password", mysqlContainer.getPassword())
+                      .build();
+              } else {
+			// For Maven or any other environment, use the default configuration
+			registry = new StandardServiceRegistryBuilder().configure("hibernate-IT.cfg.xml")
+					.applySetting("hibernate.connection.url", "jdbc:mysql://localhost:3307/expense_tracker")
+					.applySetting("hibernate.connection.password", "test").build();
+		}
 
-		MetadataSources metadataSources = new MetadataSources(registry);
-		sessionFactory = metadataSources.buildMetadata().buildSessionFactory();
+}
+
+	private static boolean isRunningInEclipse() {
+		return System.getProperty("surefire.test.class.path") == null;
 	}
 
-	@After
-	public void tearDown() {
+	@AfterAll
+	public static void shutdownDB() {
 		// Clean up Hibernate resources after each test
 		StandardServiceRegistryBuilder.destroy(registry);
 		if (sessionFactory != null) {
 			sessionFactory.close();
 		}
+		if (System.getProperty("surefire.test.class.path") == null) {
+			// Using Test containers (Eclipse environment)
+			mysqlContainer.stop();
+		}
 	}
 
+	@Before
+	public void setup() {
+
+		MetadataSources metadataSources = new MetadataSources(registry);
+		sessionFactory = metadataSources.buildMetadata().buildSessionFactory();
+	}
+	
 	@Given("The database contains the Expense with the following values")
 	public void the_database_contains_the_expenses_with_the_following_values(List<List<String>> values) {
 		// Adding multiple expenses to the database based on the provided values
