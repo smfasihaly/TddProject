@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [1.8, 11]
+        java: [8, 11]
     
     name: Unit Tests on Java ${{ matrix.java }}
     
@@ -56,7 +56,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [1.8, 11]
+        java: [8, 11]
     
     needs: unit-tests
     
