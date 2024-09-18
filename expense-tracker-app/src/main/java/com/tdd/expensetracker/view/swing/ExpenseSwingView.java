@@ -9,6 +9,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -87,10 +89,23 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 	 * Create the frame.
 	 */
 	public ExpenseSwingView() {
-
+		
+	
 		comboBoxCategoriesModel = new DefaultComboBoxModel<>();
 		listExpenseModel = new DefaultListModel<>();
-
+		
+		// To update if new category added
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowActivated(WindowEvent arg0) {
+				//comboBoxCategoriesModel.removeAllElements();
+			    expenseController.allCategory();
+			    cbxCategory.setSelectedIndex(-1);
+			}
+		
+		});
+		
+		
 		KeyAdapter btnAddEnabler = new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
@@ -500,6 +515,7 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 
 	@Override
 	public void showAllCategory(List<Category> categories) {
+		comboBoxCategoriesModel.removeAllElements();
 		categories.stream().forEach(comboBoxCategoriesModel::addElement);
 		setTotalAmountLabel();
 

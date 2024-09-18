@@ -35,12 +35,17 @@ public class DatabaseSteps {
 	// Hibernate session management
 	private static SessionFactory sessionFactory;
 	private static StandardServiceRegistry registry;
+	static  String DB_URL = "";
+	static final String DB_USER = "test";
+	static final String DB_PASS = "test";
+	
 
 	// Variables to hold references to first created expense and category
 	private Expense firstExpense;
 	private Category firstCategory;
 	  // Testcontainers MySQL container
-    public static final MySQLContainer<?>  mysqlContainer = new MySQLContainer<>(DockerImageName.parse("mysql:8.0.28"))
+    @SuppressWarnings("resource")
+	public static final MySQLContainer<?>  mysqlContainer = new MySQLContainer<>(DockerImageName.parse("mysql:8.0.28"))
             .withDatabaseName("test")
             .withUsername("test")
             .withPassword("test");
@@ -51,14 +56,13 @@ public class DatabaseSteps {
 				 
 
               mysqlContainer.start();
-              System.setProperty("DB_URL", mysqlContainer.getJdbcUrl());
-              System.setProperty("DB_USER", mysqlContainer.getUsername());
-              System.setProperty("DB_PASS", mysqlContainer.getPassword());
+              DB_URL = mysqlContainer.getJdbcUrl();
+              
     		  System.setProperty("ENVIRONMENT", "testWithEclipes");
               registry = new StandardServiceRegistryBuilder().configure("hibernate-IT.cfg.xml")
-                      .applySetting("hibernate.connection.url", mysqlContainer.getJdbcUrl())
-                      .applySetting("hibernate.connection.username", mysqlContainer.getUsername())
-                      .applySetting("hibernate.connection.password", mysqlContainer.getPassword())
+                      .applySetting("hibernate.connection.url", DB_URL)
+                      .applySetting("hibernate.connection.username",DB_USER)
+                      .applySetting("hibernate.connection.password", DB_PASS)
                       .build();
               } else {
 			// For Maven or any other environment, use the default configuration

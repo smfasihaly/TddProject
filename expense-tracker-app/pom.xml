@@ -10,6 +10,13 @@
 	<name>expense-tracker-app</name>
 
 	<properties>
+		<env-MYSQLROOTPASSWORD>test</env-MYSQLROOTPASSWORD>
+		
+		<jaxb-api-version>2.3.1</jaxb-api-version>
+		<sonar-maven-plugin-version>3.8.0.2131</sonar-maven-plugin-version>
+		<assertj-swing-junit-version>3.17.1</assertj-swing-junit-version>
+		<awaitility-version>4.0.2</awaitility-version>
+		<picocli-version>4.6.1</picocli-version>
 		<coveralls-maven-plugin-version>4.3.0</coveralls-maven-plugin-version>
 		<log4j-api-version>2.13.0</log4j-api-version>
 		<wait-log>ready for connections. Bind-address</wait-log>
@@ -93,7 +100,7 @@
 		</sonar.junit.reportPaths>
 
 	</properties>
-
+	
 	<dependencies>
 		<!-- https://mvnrepository.com/artifact/com.toedter/jcalendar -->
 		<dependency>
@@ -104,7 +111,7 @@
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-swing-junit</artifactId>
-			<version>3.17.1</version>
+			<version>${assertj-swing-junit-version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -159,7 +166,7 @@
 		<dependency>
 			<groupId>org.awaitility</groupId>
 			<artifactId>awaitility</artifactId>
-			<version>4.0.2</version>
+			<version>${awaitility-version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -174,9 +181,20 @@
 			<version>${cucumber.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>info.picocli</groupId>
+			<artifactId>picocli</artifactId>
+			<version>${picocli-version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
 		<plugins>
 			<plugin>
 				<artifactId>maven-clean-plugin</artifactId>
@@ -227,7 +245,7 @@
 			<plugin>
 				<groupId>org.sonarsource.scanner.maven</groupId>
 				<artifactId>sonar-maven-plugin</artifactId>
-				<version>3.8.0.2131</version>
+				<version>${sonar-maven-plugin-version}</version>
 			</plugin>
 		</plugins>
 	</build>
@@ -427,7 +445,7 @@
 						<artifactId>maven-failsafe-plugin</artifactId>
 						<version>${maven-surefire-plugin-version}</version>
 						<executions>
-							<execution>
+						<execution>
 								<id>default-it</id>
 								<goals>
 									<goal>integration-test</goal>
@@ -469,7 +487,7 @@
 									for MySQL -->
 										</ports>
 										<env>
-											<MYSQL_ROOT_PASSWORD>test</MYSQL_ROOT_PASSWORD>
+											<MYSQL_ROOT_PASSWORD>${env-MYSQLROOTPASSWORD}</MYSQL_ROOT_PASSWORD>
 
 											<MYSQL_DATABASE>expense_tracker</MYSQL_DATABASE>
 										</env>
@@ -567,7 +585,7 @@
 							<dependency>
 								<groupId>javax.xml.bind</groupId>
 								<artifactId>jaxb-api</artifactId>
-								<version>2.3.1</version>
+								<version>${jaxb-api-version}</version>
 							</dependency>
 						</dependencies>
 						<executions>

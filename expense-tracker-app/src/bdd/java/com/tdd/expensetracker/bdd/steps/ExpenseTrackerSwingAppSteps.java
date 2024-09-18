@@ -1,5 +1,8 @@
 package com.tdd.expensetracker.bdd.steps;
 
+import static com.tdd.expensetracker.bdd.steps.DatabaseSteps.DB_USER;
+import static com.tdd.expensetracker.bdd.steps.DatabaseSteps.DB_URL;
+import static com.tdd.expensetracker.bdd.steps.DatabaseSteps.DB_PASS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.swing.launcher.ApplicationLauncher.application;
 import static org.awaitility.Awaitility.await;
@@ -45,7 +48,13 @@ public class ExpenseTrackerSwingAppSteps {
 	public void the_Expense_View_is_shown() {
 	
 		// Launch the ExpenseTrackerSwingApp and wait for the UI to become idle
-		application("com.tdd.expensetracker.app.ExpenseTrackerSwingApp").start();
+		application("com.tdd.expensetracker.app.ExpenseTrackerSwingApp")
+		.withArgs(
+				"--mysql-DB_URL=" + DB_URL,
+				"--mysql-user=" +DB_USER,
+				"--mysql-pass=" + DB_PASS
+				)
+		.start();
 		robot.waitForIdle();
 
 		// Find the "Expense" window and assign it to the expenseTrackerWindow fixture

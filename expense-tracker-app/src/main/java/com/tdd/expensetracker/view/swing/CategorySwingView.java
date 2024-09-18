@@ -34,6 +34,8 @@ import com.tdd.expensetracker.controller.CategoryController;
 import com.tdd.expensetracker.model.Category;
 import com.tdd.expensetracker.model.Expense;
 import com.tdd.expensetracker.view.CategoryView;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class CategorySwingView extends JFrame implements CategoryView {
 
@@ -79,6 +81,14 @@ public class CategorySwingView extends JFrame implements CategoryView {
 	 * Create the frame.
 	 */
 	public CategorySwingView() {
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowActivated(WindowEvent e) {
+				listCategoryModel.removeAllElements();
+				categoryController.allCategory();
+				
+			}
+		});
 
 		listCategoryModel = new DefaultListModel<>();
 		listExpenseModel = new DefaultListModel<>();
