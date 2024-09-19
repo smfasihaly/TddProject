@@ -89,23 +89,21 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 	 * Create the frame.
 	 */
 	public ExpenseSwingView() {
-		
-	
+
 		comboBoxCategoriesModel = new DefaultComboBoxModel<>();
 		listExpenseModel = new DefaultListModel<>();
-		
+
 		// To update if new category added
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowActivated(WindowEvent arg0) {
-				//comboBoxCategoriesModel.removeAllElements();
-			    expenseController.allCategory();
-			    cbxCategory.setSelectedIndex(-1);
+				// comboBoxCategoriesModel.removeAllElements();
+				expenseController.allCategory();
+				cbxCategory.setSelectedIndex(-1);
 			}
-		
+
 		});
-		
-		
+
 		KeyAdapter btnAddEnabler = new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {

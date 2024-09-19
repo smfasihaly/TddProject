@@ -86,7 +86,7 @@ public class CategorySwingView extends JFrame implements CategoryView {
 			public void windowActivated(WindowEvent e) {
 				listCategoryModel.removeAllElements();
 				categoryController.allCategory();
-				
+
 			}
 		});
 

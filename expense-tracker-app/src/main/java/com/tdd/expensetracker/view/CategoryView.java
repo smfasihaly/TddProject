@@ -20,7 +20,5 @@ public interface CategoryView {
 	void getAllExpenses(List<Expense> expenses);
 
 	void showErrorCategoryNotFound(String message, Category category);
-	
-
 
 }

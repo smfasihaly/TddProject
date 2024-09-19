@@ -16,6 +16,4 @@ public interface ExpenseRepository {
 
 	void delete(Expense expense);
 
-
-
 }

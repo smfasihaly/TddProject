@@ -21,5 +21,4 @@ public interface ExpenseView {
 
 	void showErrorExpenseNotFound(String message, Expense expense);
 
-
 }

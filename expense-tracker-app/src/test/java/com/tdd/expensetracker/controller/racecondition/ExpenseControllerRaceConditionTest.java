@@ -57,32 +57,25 @@ public class ExpenseControllerRaceConditionTest {
 	@Test
 	public void testNewExpenseConcurrent() {
 		List<Expense> expenses = new ArrayList<>(); // List to act as a fake database
-
 		// Setup existing category mock
 		Category existingCategory = new Category("1", "name1", "description1");
 		when(categoryRepository.findById("1")).thenReturn(existingCategory);
-
 		// Create a new expense
 		Expense expense = new Expense("1", 5000d, "testExpense", LocalDate.now(), existingCategory);
-
 		// Stub the findById method to simulate repository behavior
 		when(expenseRepository.findById(anyString()))
 				.thenAnswer(invocation -> expenses.stream().findFirst().orElse(null));
-
 		// Stub the save method to add the expense to the list
 		doAnswer(invocation -> {
 			expenses.add(expense);
 			return null;
 		}).when(expenseRepository).save(any(Expense.class));
-
 		// Create and start 10 threads to simulate concurrent access
 		List<Thread> threads = IntStream.range(0, 10)
 				.mapToObj(i -> new Thread(() -> expenseController.newExpense(expense))).peek(t -> t.start())
 				.collect(Collectors.toList());
-
 		// Wait for all threads to finish
 		await().atMost(10, TimeUnit.SECONDS).until(() -> threads.stream().noneMatch(t -> t.isAlive()));
-
 		// Verify that only one expense was added to the list
 		assertThat(expenses).containsExactly(expense);
 	}
@@ -95,29 +88,23 @@ public class ExpenseControllerRaceConditionTest {
 		Category existingCategory = new Category("1", "name1", "description1");
 		Expense expense = new Expense("1", 5000d, "testExpense", LocalDate.now(), existingCategory);
 		expenses.add(expense);
-
 		// Setup existing category mock
 		when(categoryRepository.findById("1")).thenReturn(existingCategory);
-
 		// Stub the findById method to simulate repository behavior
 		when(expenseRepository.findById(anyString()))
 				.thenAnswer(invocation -> expenses.stream().findFirst().orElse(null));
-
 		// Stub the delete method to remove the expense from the list
 		doAnswer(invocation -> {
 			expenses.remove(expense);
 			deletedExpenses.add(expense);
 			return null;
 		}).when(expenseRepository).delete(any(Expense.class));
-
 		// Create and start 10 threads to simulate concurrent access
 		List<Thread> threads = IntStream.range(0, 10)
 				.mapToObj(i -> new Thread(() -> expenseController.deleteExpense(expense))).peek(t -> t.start())
 				.collect(Collectors.toList());
-
 		// Wait for all threads to finish
 		await().atMost(10, TimeUnit.SECONDS).until(() -> threads.stream().noneMatch(t -> t.isAlive()));
-
 		// Verify that the list is empty (expense was deleted)
 		assertThat(expenses).isEmpty();
 		assertThat(deletedExpenses).containsExactly(expense);
@@ -127,44 +114,35 @@ public class ExpenseControllerRaceConditionTest {
 
 	@Test
 	public void testUpdateExpenseConcurrent() {
-		List<Expense> expenses = new ArrayList<>(); 
+		List<Expense> expenses = new ArrayList<>();
 		List<Expense> updatedExpenses = new ArrayList<>(); // List to act as a fake database
-		
 		// Create and add an initial expense to the list
 		Category existingCategory = new Category("1", "name1", "description1");
 		Expense initialExpense = new Expense("1", 5000d, "testExpense", LocalDate.now(), existingCategory);
 		expenses.add(initialExpense);
-
 		// Create an updated expense
 		Expense updatedExpense = new Expense("1", 6000d, "updatedExpense", LocalDate.now(), existingCategory);
-
 		// Setup existing category mock
 		when(categoryRepository.findById("1")).thenReturn(existingCategory);
-
 		// Stub the findById method to simulate repository behavior
 		when(expenseRepository.findById(anyString()))
-		.thenAnswer(invocation -> expenses.stream().findFirst().orElse(null));
-
+				.thenAnswer(invocation -> expenses.stream().findFirst().orElse(null));
 		// Stub the save method to update the expense in the list
 		doAnswer(invocation -> {
-			//.. as initial expense is now updated
+			// .. as initial expense is now updated
 			expenses.remove(initialExpense);
 			updatedExpenses.add(updatedExpense);
 			return null;
 		}).when(expenseRepository).update(any(Expense.class));
-
 		// Create and start 10 threads to simulate concurrent access
 		List<Thread> threads = IntStream.range(0, 10)
 				.mapToObj(i -> new Thread(() -> expenseController.updateExpense(updatedExpense))).peek(t -> t.start())
 				.collect(Collectors.toList());
-
 		// Wait for all threads to finish
 		await().atMost(10, TimeUnit.SECONDS).until(() -> threads.stream().noneMatch(t -> t.isAlive()));
-
 		// Verify that the expense was updated correctly
 		assertThat(expenses).isEmpty();
 		assertThat(updatedExpenses).containsExactly(updatedExpense);
-
 		// Verify that the save method was called exactly once
 		verify(expenseRepository, times(1)).update(updatedExpense);
 	}

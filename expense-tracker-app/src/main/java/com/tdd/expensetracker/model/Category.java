@@ -35,9 +35,9 @@ public class Category {
 		this.name = name;
 		this.description = description;
 	}
-	
-	public Category( String name, String description) {
-		this.id= "";
+
+	public Category(String name, String description) {
+		this.id = "";
 		this.name = name;
 		this.description = description;
 	}

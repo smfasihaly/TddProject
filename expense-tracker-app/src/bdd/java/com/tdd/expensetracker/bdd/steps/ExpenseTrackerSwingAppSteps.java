@@ -46,17 +46,10 @@ public class ExpenseTrackerSwingAppSteps {
 
 	@When("The Expense View is shown")
 	public void the_Expense_View_is_shown() {
-	
 		// Launch the ExpenseTrackerSwingApp and wait for the UI to become idle
 		application("com.tdd.expensetracker.app.ExpenseTrackerSwingApp")
-		.withArgs(
-				"--mysql-DB_URL=" + DB_URL,
-				"--mysql-user=" +DB_USER,
-				"--mysql-pass=" + DB_PASS
-				)
-		.start();
+				.withArgs("--mysql-DB_URL=" + DB_URL, "--mysql-user=" + DB_USER, "--mysql-pass=" + DB_PASS).start();
 		robot.waitForIdle();
-
 		// Find the "Expense" window and assign it to the expenseTrackerWindow fixture
 		expenseTrackerWindow = WindowFinder.findFrame(new GenericTypeMatcher<JFrame>(JFrame.class) {
 			@Override
@@ -84,7 +77,7 @@ public class ExpenseTrackerSwingAppSteps {
 				Date localDateToDate = java.sql.Date.valueOf(e.getValue());
 				jdateChooser.setDate(localDateToDate);
 			} else if ((e.getKey().contains("ComboBox"))) {
-				 expenseTrackerWindow.comboBox(e.getKey()).selectItem(e.getValue());
+				expenseTrackerWindow.comboBox(e.getKey()).selectItem(e.getValue());
 			}
 		});
 	}
@@ -144,10 +137,8 @@ public class ExpenseTrackerSwingAppSteps {
 		// First, display the Expense View as it's the entry point for opening the
 		// Category View
 		the_Expense_View_is_shown();
-
 		// Click the button to open the Category View
 		expenseTrackerWindow.button("openCatButton").click();
-
 		// Find the "Category" window and assign it to the expenseTrackerWindow fixture
 		expenseTrackerWindow = WindowFinder.findFrame(new GenericTypeMatcher<JFrame>(JFrame.class) {
 			@Override
@@ -181,7 +172,6 @@ public class ExpenseTrackerSwingAppSteps {
 		expenseTrackerWindow.textBox("amountTextBox").enterText("10");
 		expenseTrackerWindow.comboBox("categoryComboBox").selectItem(0);
 		JDateChooser jdateChooser = findDateChooser("expenseDateChooser");
-
 		Date localDateToDate = java.sql.Date.valueOf(LocalDate.now());
 		SwingUtilities.invokeLater(() -> {
 			jdateChooser.setDate(localDateToDate);
@@ -201,7 +191,6 @@ public class ExpenseTrackerSwingAppSteps {
 		expenseTrackerWindow.textBox("amountTextBox").enterText("10");
 		expenseTrackerWindow.comboBox("categoryComboBox").selectItem(0);
 		JDateChooser jdateChooser = findDateChooser("expenseDateChooser");
-
 		Date localDateToDate = java.sql.Date.valueOf(LocalDate.now().plusDays(10));
 		SwingUtilities.invokeLater(() -> {
 			jdateChooser.setDate(localDateToDate);
@@ -221,7 +210,6 @@ public class ExpenseTrackerSwingAppSteps {
 		expenseTrackerWindow.textBox("amountTextBox").requireText(String.valueOf(DatabaseSteps.EXPENSE_AMOUNT1));
 		expenseTrackerWindow.comboBox("categoryComboBox").requireSelection(0);
 		JDateChooser jdateChooser = findDateChooser("expenseDateChooser");
-
 		Date localDateToDate = java.sql.Date.valueOf(LocalDate.now());
 		assertThat(jdateChooser.getDate()).isEqualTo(localDateToDate);
 	}
@@ -315,5 +303,4 @@ public class ExpenseTrackerSwingAppSteps {
 			}
 		});
 	}
-
 }

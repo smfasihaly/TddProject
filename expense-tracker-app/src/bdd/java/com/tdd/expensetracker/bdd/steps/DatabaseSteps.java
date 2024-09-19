@@ -35,43 +35,35 @@ public class DatabaseSteps {
 	// Hibernate session management
 	private static SessionFactory sessionFactory;
 	private static StandardServiceRegistry registry;
-	static  String DB_URL = "";
+	static String DB_URL = "";
 	static final String DB_USER = "test";
 	static final String DB_PASS = "test";
-	
 
 	// Variables to hold references to first created expense and category
 	private Expense firstExpense;
 	private Category firstCategory;
-	  // Testcontainers MySQL container
-    @SuppressWarnings("resource")
-	public static final MySQLContainer<?>  mysqlContainer = new MySQLContainer<>(DockerImageName.parse("mysql:8.0.28"))
-            .withDatabaseName("test")
-            .withUsername("test")
-            .withPassword("test");
-    
+	// Testcontainers MySQL container
+	@SuppressWarnings("resource")
+	public static final MySQLContainer<?> mysqlContainer = new MySQLContainer<>(DockerImageName.parse("mysql:8.0.28"))
+			.withDatabaseName("test").withUsername("test").withPassword("test");
+
 	@BeforeAll
 	public static void configureDB() {
 		if (isRunningInEclipse()) {
-				 
-
-              mysqlContainer.start();
-              DB_URL = mysqlContainer.getJdbcUrl();
-              
-    		  System.setProperty("ENVIRONMENT", "testWithEclipes");
-              registry = new StandardServiceRegistryBuilder().configure("hibernate-IT.cfg.xml")
-                      .applySetting("hibernate.connection.url", DB_URL)
-                      .applySetting("hibernate.connection.username",DB_USER)
-                      .applySetting("hibernate.connection.password", DB_PASS)
-                      .build();
-              } else {
+			mysqlContainer.start();
+			DB_URL = mysqlContainer.getJdbcUrl();
+			System.setProperty("ENVIRONMENT", "testWithEclipes");
+			registry = new StandardServiceRegistryBuilder().configure("hibernate-IT.cfg.xml")
+					.applySetting("hibernate.connection.url", DB_URL)
+					.applySetting("hibernate.connection.username", DB_USER)
+					.applySetting("hibernate.connection.password", DB_PASS).build();
+		} else {
 			// For Maven or any other environment, use the default configuration
 			registry = new StandardServiceRegistryBuilder().configure("hibernate-IT.cfg.xml")
 					.applySetting("hibernate.connection.url", "jdbc:mysql://localhost:3307/expense_tracker")
 					.applySetting("hibernate.connection.password", "test").build();
 		}
-
-}
+	}
 
 	private static boolean isRunningInEclipse() {
 		return System.getProperty("surefire.test.class.path") == null;
@@ -92,17 +84,15 @@ public class DatabaseSteps {
 
 	@Before
 	public void setup() {
-
 		MetadataSources metadataSources = new MetadataSources(registry);
 		sessionFactory = metadataSources.buildMetadata().buildSessionFactory();
 	}
-	
+
 	@Given("The database contains the Expense with the following values")
 	public void the_database_contains_the_expenses_with_the_following_values(List<List<String>> values) {
 		// Adding multiple expenses to the database based on the provided values
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
-
 		values.forEach(expenseValues -> {
 			Category category = new Category(expenseValues.get(3), expenseValues.get(4));
 			session.save(category); // Save category first because Expense has a foreign key to Category
@@ -110,7 +100,6 @@ public class DatabaseSteps {
 					LocalDate.parse(expenseValues.get(2)), category);
 			session.save(expense); // Save the expense with the category reference
 		});
-
 		session.getTransaction().commit();
 		session.close();
 	}
@@ -120,12 +109,10 @@ public class DatabaseSteps {
 		// Adding multiple categories to the database based on the provided values
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
-
 		values.forEach(expenseValues -> {
 			Category category = new Category(expenseValues.get(0), expenseValues.get(1));
 			session.save(category);
 		});
-
 		session.getTransaction().commit();
 		session.close();
 	}
@@ -145,9 +132,7 @@ public class DatabaseSteps {
 		// Remove the previously saved expense from the database
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
-
 		session.delete(firstExpense);
-
 		session.getTransaction().commit();
 		session.close();
 	}
@@ -165,9 +150,7 @@ public class DatabaseSteps {
 		// Remove the previously saved category from the database
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
-
 		session.delete(firstCategory);
-
 		session.getTransaction().commit();
 		session.close();
 	}
@@ -176,9 +159,7 @@ public class DatabaseSteps {
 		// Utility method to save a test expense to the database
 		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
-
 		session.save(expense);
-
 		tx.commit();
 		session.close();
 	}
@@ -187,11 +168,8 @@ public class DatabaseSteps {
 		// Utility method to save a test category to the database
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
-
 		session.save(category);
-
 		session.getTransaction().commit();
 		session.close();
 	}
-
 }

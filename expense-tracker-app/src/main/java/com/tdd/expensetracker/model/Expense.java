@@ -45,8 +45,8 @@ public class Expense {
 		this.date = date;
 		this.category = category;
 	}
-	
-	public Expense( Double amount, String description, LocalDate date, Category category) {
+
+	public Expense(Double amount, String description, LocalDate date, Category category) {
 		this.id = "";
 		this.amount = amount;
 		this.description = description;

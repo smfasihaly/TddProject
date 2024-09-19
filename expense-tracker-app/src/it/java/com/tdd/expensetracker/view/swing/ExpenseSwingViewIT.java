@@ -63,12 +63,10 @@ public class ExpenseSwingViewIT extends AssertJSwingJUnitTestCase {
 				.applySetting("hibernate.connection.url", mysqlContainer.getJdbcUrl())
 				.applySetting("hibernate.connection.username", mysqlContainer.getUsername())
 				.applySetting("hibernate.connection.password", mysqlContainer.getPassword()).build();
-
 	}
 
 	@AfterClass
 	public static void shutdownServer() {
-
 		StandardServiceRegistryBuilder.destroy(registry);
 		if (sessionFactory != null) {
 			sessionFactory.close();
@@ -78,28 +76,25 @@ public class ExpenseSwingViewIT extends AssertJSwingJUnitTestCase {
 
 	@Override
 	protected void onSetUp() throws Exception {
-
 		MetadataSources metadataSources = new MetadataSources(registry);
 		sessionFactory = metadataSources.buildMetadata().buildSessionFactory();
 		expenseRepository = new ExpenseMysqlRepository(sessionFactory);
 		categoryRepository = new CategoryMySqlRepository(sessionFactory);
 		category = new Category("1", "name1", "description1");
 		saveCategory(category);
-
 		GuiActionRunner.execute(() -> {
 			expenseSwingView = new ExpenseSwingView();
 			expenseController = new ExpenseController(expenseSwingView, expenseRepository, categoryRepository);
 			expenseSwingView.setExpenseController(expenseController);
 			return expenseSwingView;
 		});
-
 		window = new FrameFixture(robot(), expenseSwingView);
 		window.show();
-
 		GuiActionRunner.execute(() -> expenseController.allCategory());
 		window.comboBox("categoryComboBox").clearSelection();
 	}
 
+	// Test displaying all expenses.
 	@Test
 	@GUITest
 	public void testAllExpense() {
@@ -107,124 +102,105 @@ public class ExpenseSwingViewIT extends AssertJSwingJUnitTestCase {
 		Expense expense2 = new Expense(50d, "Shopping", LocalDate.now(), category);
 		expenseRepository.save(expense);
 		expenseRepository.save(expense2);
-
 		GuiActionRunner.execute(() -> expenseController.allExpense());
-
 		window.label("totalLabel").requireText("Total: 5050.0");
-		assertThat(window.list().contents()).containsExactlyInAnyOrder(getDisplayString(expense), getDisplayString(expense2));
+		assertThat(window.list().contents()).containsExactlyInAnyOrder(getDisplayString(expense),
+				getDisplayString(expense2));
 	}
 
+	// Test successful addition of a new expense.
 	@Test
 	@GUITest
 	public void testAddButtonSuccess() {
-
 		setFieldValues("testExpense", "5000", LocalDate.now(), category);
 		window.button(JButtonMatcher.withText("Add Expense")).click();
 		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> assertThat(expenseRepository.findAll()).isNotEmpty());
 		Expense createdExpense = expenseRepository.findAll().get(0);
 		assertThat(window.list().contents()).containsExactly(getDisplayString(createdExpense));
-
 		window.label("totalLabel").requireText("Total: 5000.0");
 	}
 
+	// Test adding an expense with an invalid future date, triggering an error.
 	@Test
 	@GUITest
 	public void testAddButtonError() {
-
 		setFieldValues("testExpense", "5000", LocalDate.now().plusDays(5), category);
 		window.button(JButtonMatcher.withText("Add Expense")).click();
-
 		await().atMost(5, TimeUnit.SECONDS)
 				.untilAsserted(() -> assertThat(window.label("errorMessageLabel").text().trim()).isNotBlank());
-
 		assertThat(window.list().contents()).isEmpty();
 		window.label("errorMessageLabel").requireText("Date cannot be in the future: "
 				+ new Expense(5000d, "testExpense", LocalDate.now().plusDays(5), category));
 	}
 
+	// Test successful deletion of an expense.
 	@Test
 	@GUITest
 	public void testDeleteButtonSuccess() {
-		// use the controller to populate the view's list...
 		GuiActionRunner
 				.execute(() -> expenseController.newExpense(new Expense(5000d, "Bills", LocalDate.now(), category)));
-		// ...with a expense to select
 		window.list().selectItem(0);
 		window.button(JButtonMatcher.withText("Delete Selected")).click();
 		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> assertThat(window.list().contents()).isEmpty());
 		window.label("totalLabel").requireText("Total: 0.0");
 	}
 
+	// Test deletion of an expense that does not exist, triggering an error.
 	@Test
 	@GUITest
 	public void testDeleteButtonError() {
-		// use the controller to populate the view's list...
 		Expense expense = new Expense("1", 5000d, "Bills", LocalDate.now(), category);
 		GuiActionRunner.execute(() -> expenseSwingView.getListExpenseModel().addElement(expense));
 		window.list().selectItem(0);
 		window.button(JButtonMatcher.withText("Delete Selected")).click();
 		await().atMost(5, TimeUnit.SECONDS)
 				.untilAsserted(() -> assertThat(window.label("errorMessageLabel").text().trim()).isNotBlank());
-
 		assertThat(window.list().contents()).isEmpty();
 		window.label("errorMessageLabel").requireText("Expense does not exist with id 1: " + expense);
-
 	}
 
+	// Test successful update of an expense.
 	@Test
 	@GUITest
 	public void testUpdateButtonSuccess() {
-
 		Expense expense = new Expense(5000d, "Bills", LocalDate.now(), category);
 		GuiActionRunner.execute(() -> expenseController.newExpense(expense));
 		window.list().selectItem(0);
 		window.button(JButtonMatcher.withText("Update Selected")).click();
 		Expense updatedexpense = new Expense(expense.getId(), 5000d, "change description", LocalDate.now(), category);
-
 		window.textBox("descriptionTextBox").setText(updatedexpense.getDescription());
 		window.button(JButtonMatcher.withText("Update Expense")).click();
-		await().atMost(5, TimeUnit.SECONDS)
-				.untilAsserted(() -> assertThat(window.list().contents()).containsExactly(getDisplayString(updatedexpense)));
-
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(
+				() -> assertThat(window.list().contents()).containsExactly(getDisplayString(updatedexpense)));
 		window.label("totalLabel").requireText("Total: 5000.0");
 	}
 
+	// Test updating an expense with an invalid ID, triggering an error.
 	@Test
 	@GUITest
 	public void testUpdateButtonError() {
-
 		Expense expense = new Expense("1", 5000d, "Bills", LocalDate.now(), category);
 		GuiActionRunner.execute(() -> expenseSwingView.getListExpenseModel().addElement(expense));
 		window.list().selectItem(0);
 		window.button(JButtonMatcher.withText("Update Selected")).click();
-
 		JTextField idTextBox = window.robot().finder().findByName("idTextBox", JTextField.class, false);
 		GuiActionRunner.execute(() -> idTextBox.setText("1"));
-
 		window.button(JButtonMatcher.withText("Update Expense")).click();
-
 		await().atMost(5, TimeUnit.SECONDS)
 				.untilAsserted(() -> assertThat(window.label("errorMessageLabel").text().trim()).isNotBlank());
-
 		assertThat(window.list().contents()).containsExactly(getDisplayString(expense));
-
 		window.label("errorMessageLabel").requireText("Expense does not exist with id 1: " + expense);
-
 	}
 
 	private void saveCategory(Category category) {
-
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
-
 		session.save(category);
-
 		session.getTransaction().commit();
 		session.close();
 	}
 
 	private void setFieldValues(String description, String amount, LocalDate date, Category category) {
-
 		window.textBox("descriptionTextBox").enterText(description);
 		window.textBox("amountTextBox").enterText(amount);
 		if (category != null) {
@@ -233,16 +209,17 @@ public class ExpenseSwingViewIT extends AssertJSwingJUnitTestCase {
 			window.comboBox("categoryComboBox").clearSelection();
 		}
 		if (date != null) {
-
-			JDateChooser jdateChooser = window.robot().finder().findByName("expenseDateChooser",JDateChooser.class, false);
+			JDateChooser jdateChooser = window.robot().finder().findByName("expenseDateChooser", JDateChooser.class,
+					false);
 			GuiActionRunner.execute(() -> {
 				Date localDateToDate = java.sql.Date.valueOf(date);
 				jdateChooser.setDate(localDateToDate);
 			});
 		}
 	}
-	private String getDisplayString(Expense expense) {
-		return expense.getId() + " | " + expense.getDescription() +  " | " + expense.getAmount() + " | " + expense.getDate() + " | " + expense.getCategory().getName()  ;
-	}
 
+	private String getDisplayString(Expense expense) {
+		return expense.getId() + " | " + expense.getDescription() + " | " + expense.getAmount() + " | "
+				+ expense.getDate() + " | " + expense.getCategory().getName();
+	}
 }
