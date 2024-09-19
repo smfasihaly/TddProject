@@ -25,53 +25,23 @@ public class ExpenseMysqlRepository implements ExpenseRepository {
 	// Retrieves all Expense records from the database
 	@Override
 	public List<Expense> findAll() {
-		Session session = null;
-		Transaction transaction = null;
-		try {
-			session = sessionFactory.openSession();
-			transaction = session.beginTransaction();
+		Session session = sessionFactory.openSession();
 
-			List<Expense> expenses = session.createQuery("from Expense", Expense.class).list();
+		List<Expense> expenses = session.createQuery("from Expense", Expense.class).list();
 
-			transaction.commit();
-			return expenses;
-		} catch (Exception e) {
-			if (transaction != null) {
-				transaction.rollback();
-			}
-			LOGGER.error("Failed to retrieve all expenses", e);
-			throw new HibernateException("Could not retrieve expenses.", e);
-		} finally {
-			if (session != null) {
-				session.close();
-			}
-		}
+		session.close();
+		return expenses;
 	}
 
 	// Finds an Expense by its unique ID from the database
 	@Override
 	public Expense findById(String id) {
-		Session session = null;
-		Transaction transaction = null;
-		try {
-			session = sessionFactory.openSession();
-			transaction = session.beginTransaction();
+		Session session = sessionFactory.openSession();
 
-			Expense expense = session.get(Expense.class, id);
+		Expense expense = session.get(Expense.class, id);
 
-			transaction.commit();
-			return expense;
-		} catch (Exception e) {
-			if (transaction != null) {
-				transaction.rollback();
-			}
-			LOGGER.error("Failed to find expense by id", e);
-			throw new HibernateException("Could not find expense by id.", e);
-		} finally {
-			if (session != null) {
-				session.close();
-			}
-		}
+		session.close();
+		return expense;
 	}
 
 	// Saves a new Expense to the database
@@ -93,9 +63,7 @@ public class ExpenseMysqlRepository implements ExpenseRepository {
 			LOGGER.error("Failed to save expense", e);
 			throw new HibernateException("Could not save expense.", e);
 		} finally {
-			if (session != null) {
-				session.close();
-			}
+			session.close();
 		}
 	}
 
@@ -118,9 +86,7 @@ public class ExpenseMysqlRepository implements ExpenseRepository {
 			LOGGER.error("Failed to delete expense", e);
 			throw new HibernateException("Could not delete expense.", e);
 		} finally {
-			if (session != null) {
-				session.close();
-			}
+			session.close();
 		}
 	}
 
@@ -137,15 +103,11 @@ public class ExpenseMysqlRepository implements ExpenseRepository {
 
 			transaction.commit();
 		} catch (Exception e) {
-			if (transaction != null) {
-				transaction.rollback();
-			}
+			transaction.rollback();
 			LOGGER.error("Failed to update expense", e);
 			throw new HibernateException("Could not update expense.", e);
 		} finally {
-			if (session != null) {
-				session.close();
-			}
+			session.close();
 		}
 	}
 }

@@ -25,53 +25,23 @@ public class CategoryMySqlRepository implements CategoryRepository {
 	// Retrieves all Category records from the database
 	@Override
 	public List<Category> findAll() {
-		Session session = null;
-		Transaction transaction = null;
-		try {
-			session = sessionFactory.openSession();
-			transaction = session.beginTransaction();
+		Session session = sessionFactory.openSession();
 
-			List<Category> categories = session.createQuery("from Category", Category.class).list();
+		List<Category> categories = session.createQuery("from Category", Category.class).list();
 
-			transaction.commit();
-			return categories;
-		} catch (Exception e) {
-			if (transaction != null) {
-				transaction.rollback();
-			}
-			LOGGER.error("Failed to retrieve all categories", e);
-			throw new HibernateException("Could not retrieve categories.", e);
-		} finally {
-			if (session != null) {
-				session.close();
-			}
-		}
+		session.close();
+		return categories;
 	}
 
 	// Finds a Category by its unique ID from the database
 	@Override
 	public Category findById(String id) {
-		Session session = null;
-		Transaction transaction = null;
-		try {
-			session = sessionFactory.openSession();
-			transaction = session.beginTransaction();
+		Session session = sessionFactory.openSession();
 
-			Category category = session.get(Category.class, id);
+		Category category = session.get(Category.class, id);
 
-			transaction.commit();
-			return category;
-		} catch (Exception e) {
-			if (transaction != null) {
-				transaction.rollback();
-			}
-			LOGGER.error("Failed to find category by id", e);
-			throw new HibernateException("Could not find category by id.", e);
-		} finally {
-			if (session != null) {
-				session.close();
-			}
-		}
+		session.close();
+		return category;
 	}
 
 	// Saves a new Category to the database
@@ -87,15 +57,11 @@ public class CategoryMySqlRepository implements CategoryRepository {
 
 			transaction.commit();
 		} catch (Exception e) {
-			if (transaction != null) {
-				transaction.rollback();
-			}
+			transaction.rollback();
 			LOGGER.error("Failed to save category", e);
 			throw new HibernateException("Could not save category.", e);
 		} finally {
-			if (session != null) {
-				session.close();
-			}
+			session.close();
 		}
 	}
 
@@ -112,15 +78,11 @@ public class CategoryMySqlRepository implements CategoryRepository {
 
 			transaction.commit();
 		} catch (Exception e) {
-			if (transaction != null) {
-				transaction.rollback();
-			}
+			transaction.rollback();
 			LOGGER.error("Failed to delete category", e);
 			throw new HibernateException("Could not delete category.", e);
 		} finally {
-			if (session != null) {
-				session.close();
-			}
+			session.close();
 		}
 	}
 
@@ -137,42 +99,22 @@ public class CategoryMySqlRepository implements CategoryRepository {
 
 			transaction.commit();
 		} catch (Exception e) {
-			if (transaction != null) {
-				transaction.rollback();
-			}
+			transaction.rollback();
 			LOGGER.error("Failed to update category", e);
 			throw new HibernateException("Could not update category.", e);
 		} finally {
-			if (session != null) {
-				session.close();
-			}
+			session.close();
 		}
 	}
 
 	// Finds a Category by its name from the database
 	@Override
 	public Category findByName(String name) {
-		Session session = null;
-		Transaction transaction = null;
-		try {
-			session = sessionFactory.openSession();
-			transaction = session.beginTransaction();
-
-			Category category = session.createQuery("from Category where name = :name", Category.class)
-					.setParameter("name", name).uniqueResult();
-
-			transaction.commit();
-			return category;
-		} catch (Exception e) {
-			if (transaction != null) {
-				transaction.rollback();
-			}
-			LOGGER.error("Failed to find category by name", e);
-			throw new HibernateException("Could not find category by name.", e);
-		} finally {
-			if (session != null) {
-				session.close();
-			}
-		}
+		Session session = sessionFactory.openSession();
+		Category category = session.createQuery("from Category where name = :name", Category.class)
+				.setParameter("name", name).uniqueResult();
+		session.close();
+		return category;
 	}
+
 }

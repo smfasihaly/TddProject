@@ -97,7 +97,6 @@ public class ExpenseSwingView extends JFrame implements ExpenseView {
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowActivated(WindowEvent arg0) {
-				// comboBoxCategoriesModel.removeAllElements();
 				expenseController.allCategory();
 				cbxCategory.setSelectedIndex(-1);
 			}

@@ -35,7 +35,7 @@ public class DatabaseSteps {
 	// Hibernate session management
 	private static SessionFactory sessionFactory;
 	private static StandardServiceRegistry registry;
-	static String DB_URL = "";
+	static String db_URL = "";
 	static final String DB_USER = "test";
 	static final String DB_PASS = "test";
 
@@ -51,10 +51,10 @@ public class DatabaseSteps {
 	public static void configureDB() {
 		if (isRunningInEclipse()) {
 			mysqlContainer.start();
-			DB_URL = mysqlContainer.getJdbcUrl();
+			db_URL = mysqlContainer.getJdbcUrl();
 			System.setProperty("ENVIRONMENT", "testWithEclipes");
 			registry = new StandardServiceRegistryBuilder().configure("hibernate-IT.cfg.xml")
-					.applySetting("hibernate.connection.url", DB_URL)
+					.applySetting("hibernate.connection.url", db_URL)
 					.applySetting("hibernate.connection.username", DB_USER)
 					.applySetting("hibernate.connection.password", DB_PASS).build();
 		} else {

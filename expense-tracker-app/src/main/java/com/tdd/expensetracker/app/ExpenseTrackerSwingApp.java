@@ -52,7 +52,7 @@ public class ExpenseTrackerSwingApp implements Callable<Void> {
 	private static final Logger LOGGER = LogManager.getLogger(ExpenseTrackerSwingApp.class);
 
 	// Hibernate service registry for database configuration.
-	private static StandardServiceRegistry registry;
+	private StandardServiceRegistry registry;
 
 	public static void main(String[] args) {
 		try {

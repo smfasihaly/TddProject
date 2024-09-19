@@ -1,11 +1,13 @@
 package com.tdd.expensetracker.repository.mysql;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalDate;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -108,6 +110,27 @@ public class ExpenseMysqlRepositoryTest {
 				category);
 		expenseMysqlRepository.update(updatedExpense);
 		Assertions.assertThat(readAllExpenseFromDatabase()).containsExactly(new Expense[] { updatedExpense });
+	}
+
+	// Test for exception handling when saving a null category
+	@Test
+	public void testSaveThrowsExceptionWhenNullexpense() {
+		assertThatThrownBy(() -> expenseMysqlRepository.save(null)).isInstanceOf(HibernateException.class)
+				.hasMessageContaining("Could not save expense.");
+	}
+
+	// Test for exception handling when updating a null expense
+	@Test
+	public void testUpdateThrowsExceptionWhenNullexpense() {
+		assertThatThrownBy(() -> expenseMysqlRepository.update(null)).isInstanceOf(HibernateException.class)
+				.hasMessageContaining("Could not update expense.");
+	}
+
+	// Test for exception handling when delete a null expense
+	@Test
+	public void testUpdateThrowsExceptionWhenDeleteexpense() {
+		assertThatThrownBy(() -> expenseMysqlRepository.delete(null)).isInstanceOf(HibernateException.class)
+				.hasMessageContaining("Could not delete expense.");
 	}
 
 	// Utility method to read all expenses from the database

@@ -1,10 +1,12 @@
 package com.tdd.expensetracker.repository.mysql;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -124,6 +126,27 @@ public class CategoryMySqlRepositoryTest {
 		Assertions.assertThat(readAllCategoryFromDatabase()).containsExactly(new Category[] { updateCategory });
 	}
 
+	// Test for exception handling when saving a null category
+	@Test
+	public void testSaveThrowsExceptionWhenNullCategory() {
+		assertThatThrownBy(() -> categoryMySqlRepository.save(null)).isInstanceOf(HibernateException.class)
+				.hasMessageContaining("Could not save category.");
+	}
+
+	// Test for exception handling when updating a null category
+	@Test
+	public void testUpdateThrowsExceptionWhenNullCategory() {
+		assertThatThrownBy(() -> categoryMySqlRepository.update(null)).isInstanceOf(HibernateException.class)
+				.hasMessageContaining("Could not update category.");
+	}
+
+	// Test for exception handling when delete a null category
+	@Test
+	public void testUpdateThrowsExceptionWhenDeleteCategory() {
+		assertThatThrownBy(() -> categoryMySqlRepository.delete(null)).isInstanceOf(HibernateException.class)
+				.hasMessageContaining("Could not delete category.");
+	}
+
 	// Utility method to read all categories from the database
 	private List<Category> readAllCategoryFromDatabase() {
 		Session session = sessionFactory.openSession();
@@ -143,4 +166,5 @@ public class CategoryMySqlRepositoryTest {
 		session.close();
 		return category.getId();
 	}
+
 }
