@@ -46,7 +46,7 @@ public class ExpenseTrackerSwingApp implements Callable<Void> {
 	 * "--mysql-pass".
 	 */
 	@Option(names = { "--mysql-pass" }, description = "mysql pass")
-	private String password = "test";
+	private String pass = "test";
 
 	// Logger for logging errors and information.
 	private static final Logger LOGGER = LogManager.getLogger(ExpenseTrackerSwingApp.class);
@@ -85,7 +85,7 @@ public class ExpenseTrackerSwingApp implements Callable<Void> {
 							.applySetting("hibernate.connection.url", url)
 							.applySetting("hibernate.connection.username", user)
 							.applySetting("hibernate.hbm2ddl.auto", "validate")
-							.applySetting("hibernate.connection.password", password).build();
+							.applySetting("hibernate.connection.password", pass).build();
 				} else {
 					// For other environments, load the default configuration.
 					registry = new StandardServiceRegistryBuilder().configure().build();

@@ -27,10 +27,11 @@ public class CategoryMySqlRepository implements CategoryRepository {
 	public List<Category> findAll() {
 		Session session = sessionFactory.openSession();
 
-		List<Category> categories = session.createQuery("from Category", Category.class).list();
-
-		session.close();
-		return categories;
+		try {
+			return session.createQuery("from Category", Category.class).list();
+		} finally {
+			session.close();
+		}
 	}
 
 	// Finds a Category by its unique ID from the database
@@ -38,23 +39,21 @@ public class CategoryMySqlRepository implements CategoryRepository {
 	public Category findById(String id) {
 		Session session = sessionFactory.openSession();
 
-		Category category = session.get(Category.class, id);
-
-		session.close();
-		return category;
+		try {
+			return session.get(Category.class, id);
+		} finally {
+			session.close();
+		}
 	}
 
 	// Saves a new Category to the database
 	@Override
 	public void save(Category category) {
-		Session session = null;
-		Transaction transaction = null;
+		Session session = sessionFactory.openSession();
+		Transaction transaction = session.beginTransaction();
+
 		try {
-			session = sessionFactory.openSession();
-			transaction = session.beginTransaction();
-
 			session.save(category);
-
 			transaction.commit();
 		} catch (Exception e) {
 			transaction.rollback();
@@ -68,14 +67,11 @@ public class CategoryMySqlRepository implements CategoryRepository {
 	// Deletes an existing Category from the database
 	@Override
 	public void delete(Category category) {
-		Session session = null;
-		Transaction transaction = null;
+		Session session = sessionFactory.openSession();
+		Transaction transaction = session.beginTransaction();
+
 		try {
-			session = sessionFactory.openSession();
-			transaction = session.beginTransaction();
-
 			session.delete(category);
-
 			transaction.commit();
 		} catch (Exception e) {
 			transaction.rollback();
@@ -89,14 +85,11 @@ public class CategoryMySqlRepository implements CategoryRepository {
 	// Updates an existing Category in the database
 	@Override
 	public void update(Category updatedCategory) {
-		Session session = null;
-		Transaction transaction = null;
+		Session session = sessionFactory.openSession();
+		Transaction transaction = session.beginTransaction();
+
 		try {
-			session = sessionFactory.openSession();
-			transaction = session.beginTransaction();
-
 			session.update(updatedCategory);
-
 			transaction.commit();
 		} catch (Exception e) {
 			transaction.rollback();
@@ -111,10 +104,12 @@ public class CategoryMySqlRepository implements CategoryRepository {
 	@Override
 	public Category findByName(String name) {
 		Session session = sessionFactory.openSession();
-		Category category = session.createQuery("from Category where name = :name", Category.class)
-				.setParameter("name", name).uniqueResult();
-		session.close();
-		return category;
-	}
 
+		try {
+			return session.createQuery("from Category where name = :name", Category.class).setParameter("name", name)
+					.uniqueResult();
+		} finally {
+			session.close();
+		}
+	}
 }
