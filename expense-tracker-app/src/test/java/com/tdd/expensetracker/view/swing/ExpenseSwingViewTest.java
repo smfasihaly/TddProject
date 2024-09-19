@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.verify;
 
+import java.awt.event.KeyEvent;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.concurrent.TimeUnit;
@@ -128,6 +129,8 @@ public class ExpenseSwingViewTest extends AssertJSwingJUnitTestCase {
 		amountTxtBox.setText(null);
 		amountTxtBox.enterText("12abcd345"); // mixed input (only digits should remain)
 		amountTxtBox.requireText("12345");
+		amountTxtBox.pressAndReleaseKeys(KeyEvent.VK_BACK_SPACE);
+		amountTxtBox.pressAndReleaseKeys(KeyEvent.VK_DELETE);
 	}
 
 	// Test enabling Delete and Update buttons when an expense is selected
